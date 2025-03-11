@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriHub - Farmer Sign Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-green-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center space-x-3">
+                    <h1 class="text-3xl font-bold text-green-700">AgriHub</h1>
+                </a>
+               
+                <div class="flex items-center space-x-4">
+                  <a href="/buyerlogin" class="text-gray-600 hover:text-green-600 transition-colors">Buyer Login</a>
+                  <a href="/farmerlogin" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">Farmer Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sign Up Container -->
+    <div class="min-h-screen flex items-center justify-center p-4 pt-24">
+        <div class="w-full max-w-md">
+            <!-- Decorative Elements -->
+            <div class="absolute top-0 left-0 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+            <div class="absolute top-0 right-0 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+            <div class="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+
+            <!-- Sign Up Form -->
+            <form action="{{ url_for('signupprocessfarmer') }}" method="post" class="relative bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 space-y-6 border border-white/20">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800">Farmer Sign Up</h2>
+                    <p class="text-gray-600 mt-2">Create your account to access fresh agricultural products</p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- First Name -->
+                    <div>
+                        <label for="fname" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                        <input 
+                            type="text" 
+                            id="fname" 
+                            name="fname" 
+                            placeholder="Enter your first name"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                    </div>
+
+                    <!-- Last Name -->
+                    <div>
+                        <label for="lname" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                        <input 
+                            type="text" 
+                            id="lname" 
+                            name="lname" 
+                            placeholder="Enter your last name"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                    </div>
+
+                    <!-- Gender -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="gender" value="male" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" required />
+                                <span class="ml-2 text-gray-600">Male</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="gender" value="female" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                                <span class="ml-2 text-gray-600">Female</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="gender" value="other" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                                <span class="ml-2 text-gray-600">Other</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Age -->
+                    <div>
+                        <label for="age" class="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                        <input 
+                            type="number" 
+                            id="age" 
+                            name="age" 
+                            placeholder="Enter your age"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                    </div>
+
+                    <!-- Date of Birth -->
+                    <div>
+                        <label for="dob" class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                        <input 
+                            type="date" 
+                            id="dob" 
+                            name="dob" 
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                    </div>
+
+                    <!-- Blood Group -->
+                    <div>
+                        <label for="bloodgroup" class="block text-sm font-medium text-gray-700 mb-1">Blood Group</label>
+                        <input 
+                            type="text" 
+                            id="bloodgroup" 
+                            name="bloodgroup" 
+                            placeholder="Enter your blood group"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                    </div>
+
+                    <!-- Aadhar Number -->
+                    <div>
+                        <label for="aadhaar" class="block text-sm font-medium text-gray-700 mb-1">Aadhaar Number</label>
+                        <input 
+                            type="text" 
+                            id="aadhaar" 
+                            name="aadhaar" 
+                            placeholder="Enter your Aadhaar number"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                    </div>
+
+                    <!-- Mobile Number -->
+                    <div>
+                        <label for="mobile" class="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+                        <input 
+                            type="tel" 
+                            id="mobileno" 
+                            name="mobileno" 
+                            placeholder="Enter your mobile number"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                    </div>
+
+                    <!-- Address -->
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                        <input 
+                            type="text" 
+                            id="address" 
+                            name="address" 
+                            placeholder="Enter your address"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label for="district" class="block text-sm font-medium text-gray-700 mb-1">District</label>
+                        <input 
+                            type="text" 
+                            id="district" 
+                            name="district" 
+                            placeholder="Enter your district"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                        
+                    </div>
+
+                    <!-- State -->
+                    <div>
+                        <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                        <input 
+                            type="text" 
+                            id="state" 
+                            name="state" 
+                            placeholder="Enter your state"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                        
+                    </div>
+
+                    <!-- Country -->
+                    <div>
+                        <label for="country" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                        <input 
+                            type="text" 
+                            id="country" 
+                            name="country" 
+                            placeholder="Enter your country"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                    </div>
+
+                    <!-- Pincode -->
+                    <div>
+                        <label for="pincode" class="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
+                        <input 
+                            type="text" 
+                            id="pincode" 
+                            name="pincode" 
+                            placeholder="Enter your pincode"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            placeholder="Enter your email"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="Enter your password"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div>
+                        <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                        <input 
+                            type="password" 
+                            id="confirm_password" 
+                            name="confirm_password" 
+                            placeholder="Confirm your password"
+                            class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <button 
+                    type="submit"
+                    class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 transform hover:scale-[1.02]"
+                >
+                    Sign Up
+                </button>
+
+                <p class="text-center text-gray-600">
+                    Already have an account? 
+                    <a href="{{ url_for('farmerlogin') }}" class="text-green-600 hover:text-green-800 font-medium">Log in</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .profile-picture:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+        .upload-button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .upload-button:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .upload-button input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-green-50 to-white min-h-screen">
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center space-x-3">
+                    <h1 class="text-3xl font-bold text-green-700">AgriHub</h1>
+                </a>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Welcome, {{ user_details.name }}</span>
+                    <a href="{{ url_for('logout') }}" class="btn inline-block px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-6 py-24">
+        <h1 class="text-4xl font-bold text-green-700 mb-8">Dashboard</h1>
+
+        <div class="relative mb-8">
+            <div class="relative w-40 h-40 mx-auto">
+                <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-picture">
+                <label for="profile-picture-upload" class="upload-button">
+                    <i class="fas fa-camera"></i>
+                    <input type="file" id="profile-picture-upload" name="profile_picture" accept="image/*" class="hidden" onchange="uploadProfilePicture()">
+                </label>
+            </div>
+        </div>
+
+
+        <!-- Personal Details Section -->
+        <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Personal Details</h2>
+            <p><strong>Name:</strong> {{ user_details.name }}</p>
+            <p><strong>Mobile Number:</strong> {{ user_details.mobile_number }}</p>
+            <p><strong>Email:</strong> {{ user_details.email }}</p>
+            <p><strong>Address:</strong> {{ user_details.address }}</p>
+        </div>
+
+        <!-- Additional Details Section -->
+        <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Additional Details</h2>
+            {% if additional_details %}
+                <p><strong>Soil Type:</strong> {{ additional_details.soil_type }}</p>
+                <p><strong>Acres:</strong> {{ additional_details.acres }}</p>
+                <p><strong>Fertilizers Used:</strong> {{ additional_details.fertilizers }}</p>
+                <p><strong>Livestock:</strong> {{ additional_details.livestock }}</p>
+                <p><strong>Irrigation Method:</strong> {{ additional_details.irrigation_method }}</p>
+                <p><strong>Primary Crops Grown:</strong> {{ additional_details.crop_type }}</p>
+                <p><strong>Current Farming Season:</strong> {{ additional_details.season }}</p>
+                <p><strong>Water Source:</strong> {{ additional_details.water_source }}</p>
+                <p><strong>Practicing Organic Farming:</strong> {{ additional_details.organic_farming }}</p>
+                <p><strong>Pesticides Used:</strong> {{ additional_details.pesticides_used }}</p>
+                <p><strong>Farming Machinery Used:</strong> {{ additional_details.machinery_used }}</p>
+                <p><strong>Estimated Yield Per Acre:</strong> {{ additional_details.yield_per_acre }}</p>
+                <p><strong>Nearest Market Access:</strong> {{ additional_details.market_access }}</p>
+                <p><strong>Labor Availability:</strong> {{ additional_details.labor_availability }}</p>
+                <p><strong>Common Weather Challenges:</strong> {{ additional_details.weather_conditions }}</p>
+               
+            {% else %}
+                <p class="text-gray-600">No additional details found. Please complete your profile.</p>
+            {% endif %}
+        </div>
+        
+
+        <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Your Products</h2>
+            {% if products %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for product in products %}
+                        <div class="bg-white rounded-lg shadow-md p-4">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">{{ product.product_name }}</h3>
+                            <p><strong>Quantity:</strong> {{ product.quantity }}</p>
+                            <p><strong>Price:</strong> ₹{{ product.price }}</p>
+                            <p><strong>Category:</strong> {{ product.product_category }}</p>
+                            <p><strong>Description:</strong> {{ product.description }}</p>
+                            {% if product.image_path %}
+                                <img src="{{ product.image_path[0] }}" alt="{{ product.product_name }}" class="w-full h-48 object-cover mt-4 rounded-lg">
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-600">No products found. If got some sell them on our <a href="{{ url_for('sellingpage') }}" class="text-blue-600 hover:underline font-semibold">Selling page</a> </p>
+            {% endif %}
+        </div>
+
+        <!-- Complete Profile Form -->
+        <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Complete Your Profile</h2>
+            <form action="{{ url_for('update_profile') }}" method="POST">
+                <div class="mb-4">
+                    <label for="soil_type" class="block text-gray-700">Soil Type</label>
+                    <input type="text" id="soil_type" name="soil_type" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="acres" class="block text-gray-700">Acres</label>
+                    <input type="number" id="acres" name="acres" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="fertilizers" class="block text-gray-700">Fertilizers Used</label>
+                    <input type="text" id="fertilizers" name="fertilizers" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="livestock" class="block text-gray-700">Livestock Details</label>
+                    <input type="text" id="livestock" name="livestock" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="irrigation_method" class="block text-gray-700">Irrigation Method</label>
+                    <input type="text" id="irrigation_method" name="irrigation_method" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="crop_type" class="block text-gray-700">Primary Crops Grown</label>
+                    <input type="text" id="crop_type" name="crop_type" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+            
+                <div class="mb-4">
+                    <label for="season" class="block text-gray-700">Current Farming Season</label>
+                    <select id="season" name="season" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Select Season</option>
+                        <option value="Kharif">Kharif</option>
+                        <option value="Rabi">Rabi</option>
+                        <option value="Zaid">Zaid</option>
+                    </select>
+                </div>
+            
+                <div class="mb-4">
+                    <label for="water_source" class="block text-gray-700">Water Source</label>
+                    <input type="text" id="water_source" name="water_source" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+            
+                <div class="mb-4">
+                    <label for="organic_farming" class="block text-gray-700">Practicing Organic Farming?</label>
+                    <select id="organic_farming" name="organic_farming" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Select</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+            
+                <div class="mb-4">
+                    <label for="pesticides_used" class="block text-gray-700">Pesticides Used</label>
+                    <input type="text" id="pesticides_used" name="pesticides_used" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+            
+                <div class="mb-4">
+                    <label for="machinery_used" class="block text-gray-700">Farming Machinery Used</label>
+                    <input type="text" id="machinery_used" name="machinery_used" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+            
+                <div class="mb-4">
+                    <label for="yield_per_acre" class="block text-gray-700">Estimated Yield Per Acre</label>
+                    <input type="text" id="yield_per_acre" name="yield_per_acre" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+            
+                <div class="mb-4">
+                    <label for="market_access" class="block text-gray-700">Nearest Market Access</label>
+                    <input type="text" id="market_access" name="market_access" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+            
+                <div class="mb-4">
+                    <label for="labor_availability" class="block text-gray-700">Labor Availability</label>
+                    <select id="labor_availability" name="labor_availability" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Select</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+            
+                <div class="mb-4">
+                    <label for="weather_conditions" class="block text-gray-700">Common Weather Challenges</label>
+                    <input type="text" id="weather_conditions" name="weather_conditions" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <button type="submit" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">Update Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function uploadProfilePicture() {
+            const fileInput = document.getElementById('profile-picture-upload');
+            const file = fileInput.files[0];
+            if (file) {
+                const formData = new FormData();
+                formData.append('profile_picture', file);
+
+                fetch("{{ url_for('update_profile_picture') }}", {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload(); // Reload the page to reflect the new profile picture
+                    } else {
+                        alert('Failed to upload profile picture.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>

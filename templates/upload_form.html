@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriHub - Upload & Live Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        @keyframes blob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(20px, -20px) scale(1.1); }
+            50% { transform: translate(-20px, 20px) scale(0.9); }
+            75% { transform: translate(10px, -10px) scale(1.05); }
+        }
+        .animate-blob {
+            animation: blob 7s infinite ease-in-out;
+        }
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+        .section {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 10px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            outline: none;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        video, img {
+            width: 100%;
+            max-height: 300px;
+            margin-top: 10px;
+            border-radius: 10px;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center space-x-3">
+                    <h1 class="text-3xl font-bold text-blue-700">AgriHub</h1>
+                </a>
+                <div class="flex items-center space-x-4">
+                    {% if 'number' in session %}
+                        <span class="text-gray-600">Welcome, {{ user_name }} ({{session['type']}})</span>
+                        <a href="{{ url_for('logout') }}" class="btn inline-block px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('farmerlogin') }}" class="btn inline-block px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Decorative Elements -->
+    <div class="absolute top-0 left-0 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+    <div class="absolute top-0 right-0 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+
+    <!-- Main Content -->
+    <div class="flex flex-col items-center justify-center p-4 pt-24">
+        <!-- Page Heading -->
+        <h1 class="text-4xl font-bold text-gray-800 mb-6">AI Detection System</h1>
+
+        
+        <div class="mb-6">
+            <a href="/cvpage" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i> Back to ComputerVision
+            </a>
+          </div>
+        <!-- Upload & Live Detection Sections -->
+        <div class="container flex flex-col md:flex-row w-full max-w-6xl gap-8">
+            <!-- Upload Section -->
+            <div class="section flex-1">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Upload File for {{ task | capitalize }}</h2>
+                <form action="{{ url_for('upload_page', task=task) }}" method="POST" enctype="multipart/form-data" class="flex flex-col items-center">
+                    <!-- Custom Upload Button -->
+                    <label for="fileInput" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg cursor-pointer hover:bg-blue-700 transition-colors text-center">
+                        Choose File
+                    </label>
+                    <input type="file" name="file" accept="image/*,video/*" id="fileInput" class="hidden" required>
+                    <button type="submit" class="mt-4 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors">
+                        Upload
+                    </button>
+                </form>
+        
+                <!-- Preview Uploaded Image/Video -->
+                <div class="mt-6">
+                    <img id="uploadedImage" class="hidden w-full rounded-lg">
+                    <video id="uploadedVideo" controls class="hidden w-full rounded-lg"></video>
+                </div>
+        
+                {% if result %}
+                <div class="result mt-6">
+                    <h3 class="text-xl font-bold text-gray-800">Result:</h3>
+                    <p class="text-gray-600">Detected: {{ result }}</p>
+                    {% if image_path %}
+                        <img src="{{ image_path }}" alt="Processed Result" class="mt-4 w-full rounded-lg">
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        
+            <!-- Live Detection Section -->
+            <div class="section flex-1">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Live Detection</h2>
+                <button id="startLive" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
+                    Start Live Feed
+                </button>
+                <video id="videoElement" autoplay class="hidden w-full mt-6 rounded-lg"></video>
+                <div id="liveResult" class="mt-6">
+                    <h3 class="text-xl font-bold text-gray-800">Detected:</h3>
+                    <p class="text-gray-600">No results yet.</p>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        let videoStream = null;
+        let videoElement = document.getElementById("videoElement");
+        let startLiveBtn = document.getElementById("startLive");
+        let liveResultDiv = document.getElementById("liveResult");
+        let uploadedImage = document.getElementById("uploadedImage");
+        let uploadedVideo = document.getElementById("uploadedVideo");
+        let intervalId = null;
+
+        // File Upload Preview
+        document.getElementById("fileInput").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const fileURL = URL.createObjectURL(file);
+            if (file.type.startsWith("image")) {
+                uploadedImage.src = fileURL;
+                uploadedImage.classList.remove("hidden");
+                uploadedVideo.classList.add("hidden");
+            } else if (file.type.startsWith("video")) {
+                uploadedVideo.src = fileURL;
+                uploadedVideo.classList.remove("hidden");
+                uploadedImage.classList.add("hidden");
+            }
+        });
+
+        // Start / Stop Live Detection
+        startLiveBtn.addEventListener("click", async () => {
+            if (!videoStream) {
+                try {
+                    videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    videoElement.srcObject = videoStream;
+                    videoElement.classList.remove("hidden");
+                    startLiveBtn.innerText = "Stop Live Feed";
+                    startSendingFrames();
+                } catch (error) {
+                    alert("Camera access denied!");
+                }
+            } else {
+                stopLiveFeed();
+            }
+        });
+
+        function startSendingFrames() {
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+
+            intervalId = setInterval(async () => {
+                if (!videoStream) return;
+
+                canvas.width = videoElement.videoWidth;
+                canvas.height = videoElement.videoHeight;
+                context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+                let frameData = canvas.toDataURL("image/jpeg");
+
+                let response = await fetch("/video_feed?task={{ task }}", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ frame: frameData })
+                });
+
+                let result = await response.json();
+                liveResultDiv.innerHTML = `<h3 class="text-xl font-bold text-gray-800">Detected:</h3><p class="text-gray-600">${JSON.stringify(result.prediction)}</p>`;
+            }, 500);
+        }
+
+        function stopLiveFeed() {
+            clearInterval(intervalId);
+            intervalId = null;
+
+            if (videoStream) {
+                let tracks = videoStream.getTracks();
+                tracks.forEach(track => track.stop());
+                videoStream = null;
+            }
+
+            videoElement.classList.add("hidden");
+            startLiveBtn.innerText = "Start Live Feed";
+            liveResultDiv.innerHTML = "";
+        }
+    </script>
+</body>
+</html>

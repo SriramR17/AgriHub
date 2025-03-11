@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriHub - Product Confirmation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles for image preview */
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .image-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-green-50 to-white min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center space-x-3">
+                    <h1 class="text-3xl font-bold text-green-700">AgriHub</h1>
+                </a>
+                <div class="flex items-center space-x-4">
+                    {% if 'number' in session %}
+                        <span class="text-gray-600">Welcome, {{ user_name }} ({{session['type']}})</span>
+                        <a href="{{ url_for('logout') }}" class="btn inline-block px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('farmerlogin') }}" class="btn inline-block px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700">Login</a>
+                    {% endif %}
+                </div>
+                
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-24">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-green-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+            <div class="absolute top-0 right-0 w-72 h-72 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+            <div class="absolute -bottom-8 left-20 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div class="max-w-2xl mx-auto bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20">
+            <!-- Heading -->
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Product Details</h2>
+                <p class="text-gray-600">Review and update your product information.</p>
+            </div>
+
+            <!-- Back Button -->
+            <div class="mb-6">
+              <a href="/sellingpage" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                  <i class="fas fa-arrow-left mr-2"></i> Back to Selling page
+              </a>
+          </div>
+
+            <!-- Form -->
+            <form action="{{ url_for('update_product') }}" method="POST">
+                <!-- Name -->
+                <div class="mb-6">
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                    <input type="text" id="name" name="name" value="{{ name }}" required
+                           class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors">
+                </div>
+
+                <!-- Email -->
+                <div class="mb-6">
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="email" name="email" value="{{ email }}" required
+                           class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors">
+                </div>
+
+                <!-- Contact -->
+                <div class="mb-6">
+                    <label for="contact" class="block text-sm font-medium text-gray-700 mb-2">Contact Number</label>
+                    <input type="tel" id="contact" name="contact" value="{{ contact }}" pattern="[0-9]{10}" required
+                           class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors">
+                </div>
+
+                <!-- Address -->
+                <div class="mb-6">
+                    <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Locality Address</label>
+                    <textarea id="address" name="address" rows="2" required
+                              class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors">{{ address }}</textarea>
+                </div>
+
+                <!-- Product Name -->
+                <div class="mb-6">
+                    <label for="product_name" class="block text-sm font-medium text-gray-700 mb-2">Product Name</label>
+                    <input type="text" id="product_name" name="product_name" value="{{ product_name }}" required
+                           class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors">
+                </div>
+
+                <!-- Product Type -->
+                <div class="mb-6">
+                    <label for="product_type" class="block text-sm font-medium text-gray-700 mb-2">Product Type</label>
+                    <input type="text" id="product_type" name="product_type" value="{{ product_type }}" required
+                           class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors">
+                </div>
+
+                <!-- Quantity -->
+                <div class="mb-6">
+                    <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+                    <input type="number" id="quantity" name="quantity" value="{{ quantity }}" required
+                           class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors">
+                </div>
+
+                <!-- Price -->
+                <div class="mb-6">
+                    <label for="price" class="block text-sm font-medium text-gray-700 mb-2">Price</label>
+                    <input type="number" id="price" name="price" value="{{ price }}" required
+                           class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors">
+                </div>
+
+                <!-- Description -->
+                <div class="mb-6">
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea id="description" name="description" rows="2" required
+                              class="w-full px-4 py-3 rounded-lg bg-white/50 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors">{{ description }}</textarea>
+                </div>
+
+                <!-- Uploaded Images -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Uploaded Images</label>
+                    <div class="image-preview">
+                        {% for image in image_paths %}
+                            <img src="{{ image }}" alt="Product Image">
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Save Changes Button -->
+                <button type="submit" class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 transform hover:scale-[1.02]">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

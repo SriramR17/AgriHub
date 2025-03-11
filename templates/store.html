@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriHub - Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .carousel-container {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            width: 100%;
+        }
+        .carousel-image {
+            width: 100%;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-orange-50 to-white min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center space-x-3">
+                    <h1 class="text-3xl font-bold text-orange-700">AgriHub</h1>
+                </a>
+                
+                <div class="flex items-center space-x-4">
+                    {% if 'number' in session %}
+                        <span class="text-gray-600">Welcome, {{ user_name }} ({{session['type']}})</span>
+                        <a href="{{ url_for('logout') }}" class="btn inline-block px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('farmerlogin') }}" class="btn inline-block px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-24">
+        <div class="absolute top-0 left-0 w-72 h-72 bg-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+            <div class="absolute top-0 right-0 w-72 h-72 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+            <div class="absolute -bottom-8 left-20 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="/homepage" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Homepage
+            </a>
+          </div>
+
+        <!-- Heading -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Product Store</h1>
+            <p class="text-gray-600">Explore and purchase agricultural products.</p>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="filter-container flex flex-wrap justify-center gap-4 mb-8">
+            <input type="text" id="searchBar" placeholder="Search product..." onkeyup="filterProducts()"
+                   class="px-4 py-2 rounded-lg bg-white/50 border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors">
+            <select id="categoryFilter" onchange="filterProducts()"
+                    class="px-4 py-2 rounded-lg bg-white/50 border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors">
+                <option value="">All Categories</option>
+                <option value="crop">Crops</option>
+                <option value="machinery">Machinery</option>
+                <option value="fertilizers">Fertilizers</option>
+                <option value="husbandry">Husbandry</option>
+            </select>
+            <input type="number" id="minPrice" placeholder="Min Price" oninput="filterProducts()"
+                   class="px-4 py-2 rounded-lg bg-white/50 border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors">
+            <input type="number" id="maxPrice" placeholder="Max Price" oninput="filterProducts()"
+                   class="px-4 py-2 rounded-lg bg-white/50 border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors">
+            <button onclick="resetFilters()"
+                    class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
+                Reset
+            </button>
+        </div>
+
+        <!-- Product List -->
+        <div class="store-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8" id="productContainer">
+            {% for product in products %}
+            <div class="product-card bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-6 border border-white/20 cursor-pointer transition-transform transform hover:scale-105"
+                 data-name="{{ product.product_name|lower }}" 
+                 data-category="{{ product.product_type|lower }}" 
+                 data-price="{{ product.price }}"
+                 onclick="openModal(
+                     '{{ product.product_name }}', 
+                     '{{ product.price }}', 
+                     '{{ product.description }}', 
+                     '{{ product.image_path[0] if product.image_path is iterable and product.image_path is not string else product.image_path }}', 
+                     '{{ product.name }}', 
+                     '{{ product.email }}', 
+                     '{{ product.contact_number }}', 
+                     '{{ product.locality_address }}'
+                 )">
+                <div class="product-image relative">
+                    {% if product.image_path|length > 1 %}
+                    <!-- Image Carousel -->
+                    <div class="carousel">
+                        <div class="carousel-container" id="carousel-{{ loop.index }}">
+                            {% for img in product.image_path %}
+                            <img class="carousel-image w-full h-48 object-cover rounded-lg" src="{{ img }}" alt="{{ product.product_name }}" />
+                            {% endfor %}
+                        </div>
+                        <button class="prev-btn absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white rounded-full p-2 hover:bg-gray-700"
+                                onclick="prevSlide({{ loop.index }})">&#10094;</button>
+                        <button class="next-btn absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white rounded-full p-2 hover:bg-gray-700"
+                                onclick="nextSlide({{ loop.index }})">&#10095;</button>
+                    </div>
+                    {% else %}
+                    <!-- Single Image -->
+                    <img src="{{ product.image_path[0] }}" alt="{{ product.product_name }}" class="w-full h-48 object-cover rounded-lg" />
+                    {% endif %}
+                </div>
+                <div class="product-details mt-4">
+                    <div class="product-name text-xl font-semibold text-gray-800">{{ product.product_name }}</div>
+                    <div class="product-price text-orange-600 text-lg font-medium">₹{{ product.price }}</div>
+                    <div class="product-description text-gray-600 text-sm mt-2">{{ product.description }}</div>
+                    <div class="product-quantity text-gray-600 text-sm mt-2">Quantity: {{ product.quantity }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="productModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
+        <div class="modal-content bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20 w-full max-w-2xl">
+            <span class="close-btn absolute top-4 right-4 text-2xl cursor-pointer hover:text-gray-700" onclick="closeModal()">&times;</span>
+            <img class="modal-image w-full h-64 object-cover rounded-lg" id="modalImage" src="" alt="Product Image">
+            <div class="modal-details mt-6">
+                <div class="modal-name text-2xl font-bold text-gray-800" id="modalName"></div>
+                <div class="modal-price text-orange-600 text-xl font-medium mt-2" id="modalPrice"></div>
+                <div class="modal-description text-gray-600 text-sm mt-4" id="modalDescription"></div>
+                <div class="modal-seller-name text-gray-800 mt-4" id="modalSellerName"></div>
+                <div class="modal-email text-gray-800 mt-2" id="modalEmail"></div>
+                <div class="modal-contact text-gray-800 mt-2" id="modalContact"></div>
+                <div class="modal-address text-gray-800 mt-2" id="modalAddress"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function nextSlide(index) {
+            let container = document.getElementById("carousel-" + index);
+            let images = container.getElementsByClassName("carousel-image");
+            let totalImages = images.length;
+            let currentIndex = container.dataset.index ? parseInt(container.dataset.index) : 0;
+            
+            currentIndex = (currentIndex + 1) % totalImages;
+            container.dataset.index = currentIndex;
+            container.style.transform = `translateX(-${currentIndex * 100}%)`;
+        }
+
+        function prevSlide(index) {
+            let container = document.getElementById("carousel-" + index);
+            let images = container.getElementsByClassName("carousel-image");
+            let totalImages = images.length;
+            let currentIndex = container.dataset.index ? parseInt(container.dataset.index) : 0;
+            
+            currentIndex = (currentIndex - 1 + totalImages) % totalImages;
+            container.dataset.index = currentIndex;
+            container.style.transform = `translateX(-${currentIndex * 100}%)`;
+        }
+
+        function filterProducts() {
+            let searchValue = document.getElementById("searchBar").value.toLowerCase();
+            let selectedCategory = document.getElementById("categoryFilter").value.toLowerCase();
+            let minPrice = document.getElementById("minPrice").value;
+            let maxPrice = document.getElementById("maxPrice").value;
+
+            let products = document.getElementsByClassName("product-card");
+
+            for (let product of products) {
+                let name = product.dataset.name;
+                let category = product.dataset.category;
+                let price = parseFloat(product.dataset.price);
+
+                let matchesSearch = name.includes(searchValue);
+                let matchesCategory = selectedCategory === "" || category === selectedCategory;
+                let matchesPrice = (minPrice === "" || price >= parseFloat(minPrice)) && 
+                                   (maxPrice === "" || price <= parseFloat(maxPrice));
+
+                if (matchesSearch && matchesCategory && matchesPrice) {
+                    product.style.display = "block";
+                } else {
+                    product.style.display = "none";
+                }
+            }
+        }
+
+        function resetFilters() {
+            document.getElementById("searchBar").value = "";
+            document.getElementById("categoryFilter").value = "";
+            document.getElementById("minPrice").value = "";
+            document.getElementById("maxPrice").value = "";
+            filterProducts();
+        }
+
+        function openModal(name, price, description, image, sellerName, email, contact, address) {
+            document.getElementById('modalName').innerText = name;
+            document.getElementById('modalPrice').innerText = `₹${price}`;
+            document.getElementById('modalDescription').innerText = description;
+            document.getElementById('modalImage').src = image;
+            document.getElementById('modalSellerName').innerText = `Seller: ${sellerName}`;
+            document.getElementById('modalEmail').innerText = `Email: ${email}`;
+            document.getElementById('modalContact').innerText = `Contact: ${contact}`;
+            document.getElementById('modalAddress').innerText = `Address: ${address}`;
+            document.getElementById('productModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            let modal = document.getElementById('productModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

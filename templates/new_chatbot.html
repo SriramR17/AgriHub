@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriHub - AI Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        @keyframes blob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(20px, -20px) scale(1.1); }
+            50% { transform: translate(-20px, 20px) scale(0.9); }
+            75% { transform: translate(10px, -10px) scale(1.05); }
+        }
+        .animate-blob {
+            animation: blob 7s infinite ease-in-out;
+        }
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+        .chat-container {
+            width: 92%;
+            max-width: 1100px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            height: 75vh;
+            overflow: hidden;
+            margin-top: 80px; /* Adjusted for navbar */
+        }
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+        }
+        .message {
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            margin: 8px 0;
+            word-wrap: break-word;
+            display: inline-block;
+            animation: fadeIn 0.3s ease-in-out;
+            line-height: 1.5;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+            text-align: right;
+            border-bottom-right-radius: 5px;
+        }
+        .bot-message {
+            background-color: #e9ecef;
+            color: black;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        .input-container {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            background-color: #f8f9fa;
+            border-radius: 0 0 20px 20px;
+        }
+        textarea {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            outline: none;
+            resize: none;
+            font-size: 16px;
+            min-height: 60px;
+            max-height: 120px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: border 0.3s ease;
+        }
+        textarea:focus {
+            border-color: #007bff;
+        }
+        .send-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-left: 15px;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .send-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .send-button i {
+            margin-left: 8px;
+        }
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            margin: 5px 0;
+            font-style: italic;
+            color: #666;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .toolbar {
+            display: flex;
+            padding: 10px;
+            justify-content: space-between;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+        .toolbar-button {
+            background: none;
+            border: none;
+            color: #555;
+            cursor: pointer;
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+        .toolbar-button:hover {
+            background-color: #e9ecef;
+            color: #007bff;
+        }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .message-timestamp {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 5px;
+            display: block;
+        }
+        .bot-avatar {
+            width: 30px;
+            height: 30px;
+            background-color: #28a745;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+        .message-container {
+            display: flex;
+            align-items: flex-start;
+            margin: 8px 0;
+        }
+        .message-content {
+            display: flex;
+            flex-direction: column;
+        }
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            margin-top: 15px;
+            margin-left: 20px;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+        .back-button i {
+            margin-right: 8px;
+        }
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .suggestion-chip {
+            background-color: #e7f3ff;
+            color: #007bff;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #cce5ff;
+        }
+        .suggestion-chip:hover {
+            background-color: #cce5ff;
+            transform: translateY(-2px);
+        }
+        .emoji-picker {
+            position: absolute;
+            bottom: 80px;
+            right: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            padding: 10px;
+            display: none;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 5px;
+            z-index: 100;
+        }
+        .emoji {
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+        .emoji:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white/90 backdrop-blur-md shadow-sm fixed w-full z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center space-x-3">
+                    <h1 class="text-3xl font-bold text-blue-700">AgriHub</h1>
+                </a>
+                
+                <div class="flex items-center space-x-4">
+                    {% if 'number' in session %}
+                        <span class="text-gray-600">Welcome, {{ user_name }} ({{session['type']}})</span>
+                        <a href="{{ url_for('logout') }}" class="btn inline-block px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('farmerlogin') }}" class="btn inline-block px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Back Button -->
+    <a href="/homepage" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to Homepage
+    </a>
+
+    <!-- Chat Container -->
+    <div class="flex items-center justify-center p-4">
+        <div class="chat-container">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <h2 class="text-2xl font-bold text-gray-800">Agricultural AI Assistant</h2>
+                <div class="flex space-x-3">
+                    <button id="clearChat" class="toolbar-button">
+                        <i class="fas fa-trash"></i> Clear Chat
+                    </button>
+                    <button id="downloadChat" class="toolbar-button">
+                        <i class="fas fa-download"></i> Save Chat
+                    </button>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div>
+                    <button class="toolbar-button" onclick="toggleDarkMode()">
+                        <i class="fas fa-moon"></i> Dark Mode
+                    </button>
+                    <button class="toolbar-button" onclick="toggleVoiceInput()">
+                        <i class="fas fa-microphone"></i> Voice
+                    </button>
+                </div>
+                <div>
+                    <button class="toolbar-button" onclick="increaseFontSize()">
+                        <i class="fas fa-text-height"></i> A+
+                    </button>
+                    <button class="toolbar-button" onclick="decreaseFontSize()">
+                        <i class="fas fa-text-height"></i> A-
+                    </button>
+                </div>
+            </div>
+
+            <!-- Suggested Questions -->
+            <div class="suggestion-chips">
+                <div class="suggestion-chip" onclick="selectSuggestion('What crops are best for sandy soil?')">What crops are best for sandy soil?</div>
+                <div class="suggestion-chip" onclick="selectSuggestion('How to control pests organically?')">How to control pests organically?</div>
+                <div class="suggestion-chip" onclick="selectSuggestion('Current market prices for wheat')">Current market prices for wheat</div>
+                <div class="suggestion-chip" onclick="selectSuggestion('Best irrigation methods for water conservation')">Water conservation irrigation</div>
+            </div>
+
+            <!-- Chat Box -->
+            <div class="chat-box" id="chatBox">
+                <!-- Initial bot message -->
+                <div class="message-container">
+                    <div class="bot-avatar">AI</div>
+                    <div class="message-content">
+                        <div class="message bot-message">
+                            Hello! I'm your agricultural assistant. How can I help you today with farming, crops, or market information?
+                        </div>
+                        <span class="message-timestamp">Today, 12:00 PM</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div id="typingIndicator" class="typing-indicator">
+                <div class="message-container">
+                    <div class="bot-avatar">AI</div>
+                    <div>AgriBot is typing<span class="dot-typing">...</span></div>
+                </div>
+            </div>
+
+            <!-- Emoji Picker -->
+            <div id="emojiPicker" class="emoji-picker">
+                <span class="emoji" onclick="addEmoji('😊')">😊</span>
+                <span class="emoji" onclick="addEmoji('👍')">👍</span>
+                <span class="emoji" onclick="addEmoji('🌱')">🌱</span>
+                <span class="emoji" onclick="addEmoji('🌾')">🌾</span>
+                <span class="emoji" onclick="addEmoji('🌿')">🌿</span>
+                <span class="emoji" onclick="addEmoji('🚜')">🚜</span>
+                <span class="emoji" onclick="addEmoji('🍎')">🍎</span>
+                <span class="emoji" onclick="addEmoji('🍅')">🍅</span>
+                <span class="emoji" onclick="addEmoji('🥕')">🥕</span>
+                <span class="emoji" onclick="addEmoji('🌽')">🌽</span>
+                <span class="emoji" onclick="addEmoji('🥔')">🥔</span>
+                <span class="emoji" onclick="addEmoji('🥦')">🥦</span>
+                <span class="emoji" onclick="addEmoji('🥒')">🥒</span>
+                <span class="emoji" onclick="addEmoji('🌧️')">🌧️</span>
+                <span class="emoji" onclick="addEmoji('☀️')">☀️</span>
+                <span class="emoji" onclick="addEmoji('❤️')">❤️</span>
+            </div>
+
+            <!-- Input Container -->
+            <div class="input-container">
+                <textarea 
+                    id="userInput" 
+                    placeholder="Type your message..." 
+                    rows="2"
+                    onkeydown="handleKeyPress(event)"
+                ></textarea>
+                <button class="toolbar-button" onclick="toggleEmojiPicker()">
+                    <i class="far fa-smile"></i>
+                </button>
+                <button class="send-button" onclick="sendMessage()">
+                    Send <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Decorative Elements -->
+    <div class="absolute top-0 left-0 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+    <div class="absolute top-0 right-0 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+
+    <script>
+        let isRequestInProgress = false;
+        let darkMode = false;
+        let currentFontSize = 16;
+        let recognition;
+
+        // Initialize chat with welcome message
+        window.onload = function() {
+            // Initialize speech recognition if available
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById("userInput").value = transcript;
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error', event.error);
+                };
+                
+                recognition.onend = function() {
+                    document.querySelector('.fa-microphone').style.color = '';
+                };
+            }
+        };
+
+        function sendMessage() {
+            if (isRequestInProgress) return;  // Prevent multiple API calls
+            
+            let inputField = document.getElementById("userInput");
+            let userText = inputField.value.trim();
+            if (userText === "") return;
+
+            isRequestInProgress = true;
+            displayUserMessage(userText);
+
+            // Show typing indicator
+            document.getElementById("typingIndicator").style.display = "block";
+
+            // Simulate API call
+            setTimeout(() => {
+                getBotResponse(userText);
+            }, 1000);
+
+            inputField.value = "";
+            // Auto resize back to default
+            inputField.style.height = "auto";
+        }
+
+        function getBotResponse(userText) {
+            // In a real implementation, this would be an API call
+            fetch("/chatprocess2", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("typingIndicator").style.display = "none";
+                displayBotMessage(data.response || getSimulatedResponse(userText));
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("typingIndicator").style.display = "none";
+                // Fallback to simulated response in case of error
+                displayBotMessage(getSimulatedResponse(userText));
+            })
+            .finally(() => {
+                isRequestInProgress = false;
+            });
+        }
+
+        function getSimulatedResponse(userText) {
+            // This is just a fallback for demonstration purposes
+            const lowerText = userText.toLowerCase();
+            
+            if (lowerText.includes("soil") || lowerText.includes("sandy")) {
+                return "Sandy soils are well-suited for crops like carrots, potatoes, and radishes because they provide good drainage. Consider adding organic matter to improve water retention.";
+            } else if (lowerText.includes("pest") || lowerText.includes("insect")) {
+                return "For organic pest control, you can try companion planting, introducing beneficial insects like ladybugs, or using neem oil spray. Would you like more specific recommendations for particular pests?";
+            } else if (lowerText.includes("price") || lowerText.includes("market")) {
+                return "Current market trends show stable prices for most grains. Wheat is averaging $7.20 per bushel, while corn is around $4.85. Would you like more detailed market information?";
+            } else if (lowerText.includes("water") || lowerText.includes("irrigation")) {
+                return "Drip irrigation can reduce water usage by up to 60% compared to sprinkler systems. For conservation, consider mulching, rainwater harvesting, and soil moisture sensors to optimize irrigation timing.";
+            } else {
+                return "Thank you for your question. To give you the best advice, I'd need to gather some more information about your specific farming situation. Could you tell me more about your location, soil type, or specific crop concerns?";
+            }
+        }
+
+        function displayUserMessage(text) {
+            let chatBox = document.getElementById("chatBox");
+            
+            let timestamp = getCurrentTime();
+            
+            let messageHTML = `
+                <div class="message user-message">
+                    ${text}
+                </div>
+                <span class="message-timestamp" style="text-align: right;">${timestamp}</span>
+            `;
+            
+            let messageDiv = document.createElement("div");
+            messageDiv.className = "message-content";
+            messageDiv.style.alignSelf = "flex-end";
+            messageDiv.innerHTML = messageHTML;
+            
+            let containerDiv = document.createElement("div");
+            containerDiv.className = "message-container";
+            containerDiv.style.justifyContent = "flex-end";
+            containerDiv.appendChild(messageDiv);
+            
+            chatBox.appendChild(containerDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function displayBotMessage(text) {
+            let chatBox = document.getElementById("chatBox");
+            let timestamp = getCurrentTime();
+            
+            let messageContainer = document.createElement("div");
+            messageContainer.className = "message-container";
+            
+            let avatarDiv = document.createElement("div");
+            avatarDiv.className = "bot-avatar";
+            avatarDiv.textContent = "AI";
+            
+            let messageContent = document.createElement("div");
+            messageContent.className = "message-content";
+            
+            let messageDiv = document.createElement("div");
+            messageDiv.className = "message bot-message";
+            messageDiv.innerHTML = text.replace(/\n/g, "<br>");
+            
+            let timestampSpan = document.createElement("span");
+            timestampSpan.className = "message-timestamp";
+            timestampSpan.textContent = timestamp;
+            
+            messageContent.appendChild(messageDiv);
+            messageContent.appendChild(timestampSpan);
+            
+            messageContainer.appendChild(avatarDiv);
+            messageContainer.appendChild(messageContent);
+            
+            chatBox.appendChild(messageContainer);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function getCurrentTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12; // Convert 0 to 12
+            
+            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+            
+            return `Today, ${hours}:${formattedMinutes} ${ampm}`;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+            
+            // Auto-resize the textarea
+            const textarea = document.getElementById("userInput");
+            textarea.style.height = "auto";
+            textarea.style.height = (textarea.scrollHeight) + "px";
+        }
+
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            const chatContainer = document.querySelector('.chat-container');
+            const body = document.body;
+            
+            if (darkMode) {
+                body.style.background = "linear-gradient(to bottom right, #1a1a2e, #16213e)";
+                chatContainer.style.backgroundColor = "rgba(30, 30, 40, 0.9)";
+                chatContainer.style.color = "#f0f0f0";
+                
+                // Adjust message colors
+                document.querySelectorAll('.bot-message').forEach(el => {
+                    el.style.backgroundColor = "#2a2a3a";
+                    el.style.color = "#f0f0f0";
+                });
+                
+                document.querySelectorAll('.toolbar, .input-container').forEach(el => {
+                    el.style.backgroundColor = "#2a2a3a";
+                    el.style.color='black'
+                });
+                
+                document.querySelectorAll('.toolbar-button').forEach(el => {
+                    el.style.color = "#f0f0f0";
+                });
+                
+                document.querySelector('.text-gray-800').style.color = "#f0f0f0";
+            } else {
+                body.style.background = "linear-gradient(to bottom right, #e6f0ff, #e6f7ff)";
+                chatContainer.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
+                chatContainer.style.color = "#333";
+                
+                // Reset message colors
+                document.querySelectorAll('.bot-message').forEach(el => {
+                    el.style.backgroundColor = "#e9ecef";
+                    el.style.color = "#000";
+                });
+                
+                document.querySelectorAll('.toolbar, .input-container').forEach(el => {
+                    el.style.backgroundColor = "#f8f9fa";
+                });
+                
+                document.querySelectorAll('.toolbar-button').forEach(el => {
+                    el.style.color = "#555";
+                });
+                
+                document.querySelector('.text-gray-800').style.color = "#1f2937";
+            }
+        }
+
+        function increaseFontSize() {
+            if (currentFontSize < 24) {
+                currentFontSize += 2;
+                updateFontSize();
+            }
+        }
+
+        function decreaseFontSize() {
+            if (currentFontSize > 12) {
+                currentFontSize -= 2;
+                updateFontSize();
+            }
+        }
+
+        function updateFontSize() {
+            document.querySelectorAll('.message').forEach(el => {
+                el.style.fontSize = currentFontSize + 'px';
+            });
+        }
+
+        function toggleVoiceInput() {
+            if (!recognition) {
+                alert("Speech recognition is not supported in your browser.");
+                return;
+            }
+            
+            try {
+                document.querySelector('.fa-microphone').style.color = '#ff4757';
+                recognition.start();
+            } catch (e) {
+                console.error('Speech recognition error', e);
+            }
+        }
+
+        function clearChat() {
+            // Clear all messages except the initial bot greeting
+            const chatBox = document.getElementById("chatBox");
+            const firstMessage = chatBox.firstChild;
+            
+            chatBox.innerHTML = '';
+            if (firstMessage) {
+                chatBox.appendChild(firstMessage);
+            } else {
+                // If somehow the first message is gone, add a new greeting
+                displayBotMessage("Hello! I'm your agricultural assistant. How can I help you today with farming, crops, or market information?");
+            }
+        }
+
+        function downloadChat() {
+            // Get all text from chat
+            let chatContent = "AgriHub Chat Log - " + new Date().toLocaleString() + "\n\n";
+            
+            document.querySelectorAll('.message').forEach(el => {
+                const isUser = el.classList.contains('user-message');
+                const sender = isUser ? "You" : "AgriBot";
+                chatContent += sender + ": " + el.textContent + "\n\n";
+            });
+            
+            // Create download link
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(chatContent));
+            element.setAttribute('download', 'AgriHub_Chat_' + new Date().toISOString().slice(0,10) + '.txt');
+            
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        function toggleEmojiPicker() {
+            const picker = document.getElementById('emojiPicker');
+            picker.style.display = picker.style.display === 'grid' ? 'none' : 'grid';
+        }
+
+        function addEmoji(emoji) {
+            const textarea = document.getElementById('userInput');
+            textarea.value += emoji;
+            document.getElementById('emojiPicker').style.display = 'none';
+            textarea.focus();
+        }
+
+        function selectSuggestion(text) {
+            document.getElementById('userInput').value = text;
+            sendMessage();
+        }
+
+        // Event listeners
+        document.getElementById('clearChat').addEventListener('click', clearChat);
+        document.getElementById('downloadChat').addEventListener('click', downloadChat);
+
+        // Close emoji picker when clicking outside
+        document.addEventListener('click', function(event) {
+            const picker = document.getElementById('emojiPicker');
+            const emojiButton = document.querySelector('.fa-smile').parentNode;
+            
+            if (picker.style.display === 'grid' && 
+                event.target !== picker && 
+                !picker.contains(event.target) && 
+                event.target !== emojiButton && 
+                !emojiButton.contains(event.target)) {
+                picker.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

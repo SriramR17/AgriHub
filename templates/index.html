@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriHub - Smart Agriculture Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+</head>
+<body class="bg-gradient-to-b from-green-50 to-white min-h-screen">
+    <!-- Hero Section -->
+    <header class="relative overflow-hidden">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-4xl font-bold text-green-700">AgriHub</h1>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#features" class="text-gray-600 hover:text-green-600">Features</a>
+                    <a href="#about" class="text-gray-600 hover:text-green-600">About</a>
+                    <a href="#contact" class="text-gray-600 hover:text-green-600">Contact</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container mx-auto px-6 py-16 text-center">
+            <h2 class="text-5xl md:text-6xl font-bold text-gray-800 mb-8">
+                Revolutionizing Agriculture with Technology
+            </h2>
+            <p class="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
+                Join the future of farming with AI-powered solutions, real-time market insights, and a thriving farming community.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-6">
+                <a href="/farmerlogin" class="inline-block px-8 py-4 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transform hover:scale-105 transition duration-300 shadow-lg">
+                    Login as Farmer
+                </a>
+                <a href="/buyerlogin" class="inline-block px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transform hover:scale-105 transition duration-300 shadow-lg">
+                    Login as Buyer
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center text-gray-800 mb-16">Our Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- AI Vision Feature -->
+                <div class="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300" data-aos="fade-up">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3">AI Vision Technology</h3>
+                    <p class="text-gray-600">Detect weeds, analyze leaf diseases, and count products with our advanced computer vision system.</p>
+                </div>
+
+                <!-- Smart Chatbot -->
+                <div class="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3">Smart Chatbot</h3>
+                    <p class="text-gray-600">Get instant answers to your farming questions with our LLaMA-powered AI assistant.</p>
+                </div>
+
+                <!-- Market Insights -->
+                <div class="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3">Market Insights</h3>
+                    <p class="text-gray-600">Real-time crop prices and agricultural news to help you make informed decisions.</p>
+                </div>
+
+                <!-- Farmer Community -->
+                <div class="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3">Farmer Community</h3>
+                    <p class="text-gray-600">Connect with fellow farmers, share experiences, and grow together.</p>
+                </div>
+
+                <!-- Financial Services -->
+                <div class="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300" data-aos="fade-up" data-aos-delay="400">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3">Financial Services</h3>
+                    <p class="text-gray-600">Access real-time information about loans and insurance schemes for farmers.</p>
+                </div>
+
+                <!-- E-Commerce -->
+                <div class="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300" data-aos="fade-up" data-aos-delay="500">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3">E-Commerce Platform</h3>
+                    <p class="text-gray-600">Buy and sell agricultural products, machinery, and farming supplies.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="bg-green-700 py-20">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold text-white mb-8">Ready to Transform Your Farming?</h2>
+            <p class="text-xl text-green-100 mb-12 max-w-2xl mx-auto">
+                Join thousands of farmers who are already benefiting from our smart agricultural solutions.
+            </p>
+            <div class="flex justify-center space-x-6">
+                <a href="farmersignup" class="inline-block px-8 py-4 bg-white text-green-700 rounded-lg font-semibold hover:bg-green-50 transform hover:scale-105 transition duration-300">
+                    Get Started Now
+                </a>
+                <a href="#" onclick="openModal()" class="inline-block px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-green-700 transform hover:scale-105 transition duration-300">
+                    Learn More
+                </a>
+            
+                <!-- Modal -->
+                <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+                    <div class="bg-white p-6 rounded-lg max-w-lg text-green-700 shadow-xl">
+                        <h2 class="text-2xl font-bold mb-4">Welcome to AgriHub 🌿</h2>
+                        <p class="mb-2"><strong>1. Introduction:</strong> AgriHub is a modern platform designed to revolutionize agriculture through technology and innovation.</p>
+                        <p class="mb-2"><strong>2. Smart Farming:</strong> We use AI and IoT to optimize crop growth, reduce waste, and maximize yield.</p>
+                        <p class="mb-2"><strong>3. Marketplace:</strong> Farmers can connect directly with buyers, cutting out middlemen and ensuring fair prices.</p>
+                        <p class="mb-2"><strong>4. Precision Agriculture:</strong> We provide satellite and drone-based analysis for better crop monitoring.</p>
+                        <p class="mb-2"><strong>5. Training & Webinars:</strong> AgriHub offers courses on sustainable farming, organic methods, and advanced techniques.</p>
+        
+                        <p class="mb-2"><strong>7. Community Support:</strong> A space for farmers to discuss, share experiences, and seek expert advice.</p>
+                        <p class="mb-2"><strong>8. Government Schemes:</strong> Get the latest updates on agriculture-related subsidies and schemes.</p>
+                        
+                        <p class="mb-2"><strong>9. Future Vision:</strong> AgriHub aims to create a self-sustaining agricultural ecosystem driven by technology.</p>
+            
+                        <button onclick="closeModal()" class="mt-4 px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-600 transition">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">AgriHub</h3>
+                    <p class="text-gray-400">Empowering farmers with technology</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Home</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Services</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Features</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">AI Vision</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Market Insights</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Community</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Financial Services</a></li>
+                    </ul>
+                </div>
+                <div id="contact">
+                    <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>Email: contact@agrihub.com</li>
+                        <li>Phone: +1 (555) 123-4567</li>
+                        <li>Address: 123 Farming Street, Agritown, AT 12345</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 AgriHub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize AOS (Animate On Scroll)
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
+
+        function openModal() {
+            document.getElementById("modal").classList.remove("hidden");
+        }
+
+        function closeModal() {
+            document.getElementById("modal").classList.add("hidden");
+        }
+
+        // Close modal when clicking outside the content
+        window.onclick = function(event) {
+            let modal = document.getElementById("modal");
+            if (event.target === modal) {
+                modal.classList.add("hidden");
+            }
+        };
+    </script>
+</body>
+</html>
