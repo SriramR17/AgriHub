@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request , jsonify, session, app, Response, redirect, url_for,flash
-from utils.actions import login_validation_check , selling_injection_in_mongo , generate_response , signup_mongo ,compute_plan_agri , apple_count , weed_detection , leaf_disease_detection , fetch_store_documents,scrape_agriculture_news, get_weather
+from utils.actions import get_profile_picture,get_user_name,login_validation_check , selling_injection_in_mongo ,  signup_mongo ,compute_plan_agri , apple_count , weed_detection , leaf_disease_detection , fetch_store_documents,scrape_agriculture_news, get_weather
 import os
 from pymongo import MongoClient
 import ollama
@@ -18,7 +18,7 @@ db = client["agribot"]
 PROTECTED_ROUTES = [
     '/homepage', '/storepage', '/sellingpage', '/financialpage', 
     '/Insurancepage', '/loanpage', '/loanformpage', '/insuranceformpage', 
-    '/chatbotpage', '/dashboardpage', '/communicationpage', '/newspage', 
+    '/chatbotpage', '/dashboard', '/communication', '/newspage', 
     '/quickstartpage', '/cvpage'
 ]
 
@@ -27,27 +27,18 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 app = Flask(__name__)
 
 app.secret_key = "summasecretkey"
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
+
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+
+
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-def get_user_name(number, user_type):
-    """
-    Fetch the user's name from the appropriate collection based on user type.
-    """
-    if user_type == "farmer":
-        collection = db["farmer_details"]
-    elif user_type == "buyer":
-        collection = db["buyer_details"]
-    else:
-        return None  # Invalid user type
 
-    user = collection.find_one({"mobile_number": number})
-    if user:
-        return user.get("name", "User")  # Return the name or a default value
-    return None
+    
 
 @app.before_request
 def before_request():
@@ -202,25 +193,33 @@ def dashboard():
         user_products = list(db["store"].find({"contact_number": number}))
         profile_picture = user_details.get("profile_picture", None)
         if not profile_picture:
-            profile_picture = "D:\AgriHub-main\static\images\default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3383.avif"
+            profile_picture = "images/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3383.avif"
+        profile_picture = profile_picture.replace("\\", "/") 
+        profile_picture = profile_picture.split("static/")[-1]
+        
+    
     elif user_type == "buyer":
         user_details = db["buyer_details"].find_one({"mobile_number": number})
         additional_details = db["buyer_dashboard"].find_one({"mobile_number": number})
         user_products = list(db["store"].find({"contact_number": number}))
         profile_picture = user_details.get("profile_picture", None)
         if not profile_picture:
-            profile_picture = "D:\AgriHub-main\static\images\default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3383.avif"
+            profile_picture = "images/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3383.avif"
+        profile_picture = profile_picture.replace("\\", "/") 
+        profile_picture = profile_picture.split("static/")[-1]
+        
 
 
     
-
+    
     
     else:
         return "Invalid user type", 400
 
     if not user_details:
         return "User not found", 404
-
+    
+    print(profile_picture)
     return render_template("dashboard.html", user_details=user_details, additional_details=additional_details, user_type=user_type, products=user_products, profile_picture=profile_picture)
 
 @app.route("/update_profile", methods=["POST"])
@@ -276,6 +275,7 @@ def update_profile_picture():
     user_type = session['type']
     number = session['number']
 
+    
     if 'profile_picture' not in request.files:
         flash("No file selected", "error")
         return redirect(url_for('dashboard'))
@@ -284,12 +284,15 @@ def update_profile_picture():
     if file.filename == '':
         flash("No file selected", "error")
         return redirect(url_for('dashboard'))
+    
+    
 
     if file:
         # Save the file to the upload folder
         filename = f"{number}_{file.filename}"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
+        
 
         # Update the profile picture path in MongoDB
         if user_type == "farmer":
@@ -317,9 +320,161 @@ def newspage():
     user_name = get_user_name(session['number'], session['type'])
     return render_template("news1.html", news_articles=news_articles,weather_data=weather_data, city=city,user_name=user_name) 
 
-@app.route("/communicationpage")
-def communicationpage():
-    return render_template("communication.html") 
+@app.route('/communication')
+def communication():
+    if 'number' not in session or 'type' not in session:
+        return redirect(url_for('hello_world'))  # Redirect if not logged in
+
+    user_type = session['type']
+    number = session['number']
+    user_name = get_user_name(session['number'], session['type'])
+    
+    # Fetch posts
+    posts = list(db.posts.find().sort("timestamp", -1))
+    
+   
+    # Fetch users
+    farmers = list(db.farmer_details.find({}, {'_id': 0}))
+    buyers = list(db.buyer_details.find({}, {'_id': 0}))
+    users = farmers + buyers
+    
+    user_dict = {user["mobile_number"]: user.get("profile_picture", None) for user in users}
+
+    # Attach profile pictures to posts
+    for post in posts:
+        post["profile_picture"] = user_dict.get(post.get("mobile_number"), None)
+    
+    users = [user for user in users if str(user["mobile_number"]) != str(session["number"])]
+    
+    
+    return render_template('communication.html', session=session, posts=posts, users=users,user_name=user_name,user_type=user_type)
+
+@app.route("/profile/<mobile_number>")
+def profile_page(mobile_number):
+
+    if 'number' not in session or 'type' not in session:
+        return redirect(url_for('hello_world')) 
+    # Fetch user details from farmers or buyers
+    user = db.farmer_details.find_one({"mobile_number": mobile_number}, {"_id": 0}) or \
+           db.buyer_details.find_one({"mobile_number": mobile_number}, {"_id": 0})
+
+    if not user:
+        return "User not found", 404
+    
+    
+    
+    user_name = get_user_name(session['number'], session['type'])
+    
+    # Fetch products where 'contact' matches the user's number
+    products = list(db.store.find({"contact": mobile_number}, {"_id": 0}))
+
+    return render_template("profile.html", user=user, products=products,user_name=user_name)
+
+@app.route('/post_thought', methods=['POST'])
+def post_thought():
+    if 'number' not in session:
+        return redirect(url_for('hello_world'))
+    
+    user_name = get_user_name(session['number'], session['type'])
+    
+    text = request.form.get('text')
+    file = request.files.get('photo')
+    photo_path = None
+    
+    if file and file.filename:
+        filename = f"{session['number']}_{datetime.now().strftime('%Y%m%d%H%M%S')}.jpg"
+        relative_path = os.path.join('uploads', filename).replace('\\', '/')  # Convert \ to /
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    
+        photo_path = relative_path  # Store only the relative path (with /)
+
+    print(f"Saved photo_path: {photo_path}")
+
+    
+    post_data = {
+        'user_number': session['number'],
+        'user_name': user_name,
+        'text': text,
+        'photo_path': photo_path,
+        'timestamp': datetime.now()
+    }
+    db.posts.insert_one(post_data)
+    return redirect(url_for('communication'))
+
+
+
+
+
+@app.route("/chat")
+def chat_page():
+    if "number" not in session:
+        return redirect(url_for("hello_world"))
+    
+    user_name = get_user_name(session['number'], session['type'])
+
+    # Fetch all users from both collections
+    farmers = list(db.farmer_details.find({}, {"_id": 0, "name": 1, "mobile_number": 1}))
+    buyers = list(db.buyer_details.find({}, {"_id": 0, "name": 1, "mobile_number": 1}))
+
+    # Merge lists and remove the logged-in user
+    users = farmers + buyers
+    users = [user for user in users if str(user["mobile_number"]) != str(session["number"])]
+
+    # Auto-select the first user for chat
+    if users:
+        return redirect(url_for("chat", receiver_number=users[0]["mobile_number"]))
+    
+    return render_template("chat.html", users=users, messages=[], receiver_name="Select a user",user_name=user_name, receiver_number=None)
+
+
+@app.route("/chat/<receiver_number>")
+def chat(receiver_number):
+    if "number" not in session:
+        return redirect(url_for("hello_world"))
+    
+    user_name = get_user_name(session['number'], session['type'])
+
+    receiver = db.farmer_details.find_one({"mobile_number": receiver_number}, {"_id": 0, "name": 1})
+    if not receiver:
+        receiver = db.buyer_details.find_one({"mobile_number": receiver_number}, {"_id": 0, "name": 1})
+
+    receiver_name = receiver["name"] if receiver else "Unknown User"
+
+    messages = list(db.messages.find(
+        {"$or": [
+            {"sender": session["number"], "receiver": receiver_number},
+            {"sender": receiver_number, "receiver": session["number"]}
+        ]}
+    ).sort("timestamp", 1))
+
+    farmers = list(db.farmer_details.find({}, {"_id": 0, "name": 1, "mobile_number": 1}))
+    buyers = list(db.buyer_details.find({}, {"_id": 0, "name": 1, "mobile_number": 1}))
+    users = farmers + buyers
+    users = [user for user in users if user["mobile_number"] != session["number"]]
+    
+
+    return render_template("chat.html", users=users, messages=messages, user_name=user_name,receiver_name=receiver_name, receiver_number=receiver_number)
+
+
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    if 'number' not in session:
+        return redirect(url_for('hello_world'))
+    
+    user_name = get_user_name(session['number'], session['type'])
+    
+    receiver = request.form.get('receiver')
+    message = request.form.get('message')
+    
+    msg_data = {
+        'sender': session['number'],
+        'receiver': receiver,
+        'message': message,
+        'timestamp': datetime.now()
+    }
+    db.messages.insert_one(msg_data)
+    
+    return redirect(url_for('chat', receiver_number=receiver))
 
 @app.route("/storepage", methods=["GET"])
 def storepage():

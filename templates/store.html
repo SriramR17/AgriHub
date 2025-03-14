@@ -3,10 +3,54 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AgriHub - Store</title>
+    <title>AgriHub - Marketplace</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            light: '#FEF9F3',
+                            DEFAULT: '#F97316',
+                            dark: '#C2410C',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    animation: {
+                        blob: "blob 7s infinite",
+                    },
+                    keyframes: {
+                        blob: {
+                            "0%": {
+                                transform: "translate(0px, 0px) scale(1)",
+                            },
+                            "33%": {
+                                transform: "translate(30px, -50px) scale(1.1)",
+                            },
+                            "66%": {
+                                transform: "translate(-20px, 20px) scale(0.9)",
+                            },
+                            "100%": {
+                                transform: "translate(0px, 0px) scale(1)",
+                            },
+                        },
+                    },
+                }
+            }
+        }
+    </script>
     <style>
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
         .carousel-container {
             display: flex;
             transition: transform 0.5s ease-in-out;
@@ -16,23 +60,53 @@
             width: 100%;
             flex-shrink: 0;
         }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #F97316;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #C2410C;
+        }
     </style>
 </head>
-<body class="bg-gradient-to-b from-orange-50 to-white min-h-screen">
+<body class="bg-gradient-to-b from-orange-50 to-white min-h-screen font-sans relative">
+    <!-- Background blobs -->
+    <div class="absolute top-0 left-0 w-72 h-72 bg-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+    <div class="absolute top-0 right-0 w-72 h-72 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-8 left-20 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+
     <!-- Navigation -->
-    <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full z-50">
-        <div class="container mx-auto px-6 py-4">
+    <nav class="bg-white/90 backdrop-blur-md shadow-md fixed w-full z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-3">
             <div class="flex items-center justify-between">
-                <a href="/" class="flex items-center space-x-3">
-                    <h1 class="text-3xl font-bold text-orange-700">AgriHub</h1>
+                <a href="/" class="flex items-center space-x-2">
+                    <h1 class="text-3xl font-bold text-brand-dark">AgriHub</h1>
+                    <span class="hidden md:inline-block text-sm text-gray-600">Marketplace</span>
                 </a>
                 
                 <div class="flex items-center space-x-4">
                     {% if 'number' in session %}
-                        <span class="text-gray-600">Welcome, {{ user_name }} ({{session['type']}})</span>
-                        <a href="{{ url_for('logout') }}" class="btn inline-block px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700">Logout</a>
+                        <div class="hidden md:flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
+                            <i class="fas fa-user-circle text-gray-600"></i>
+                            <span class="text-gray-700">{{ user_name }}</span>
+                            <span class="text-xs px-2 py-1 bg-brand rounded-full text-white">{{session['type']}}</span>
+                        </div>
+                        <a href="{{ url_for('logout') }}" class="inline-flex items-center space-x-1 px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all shadow-sm hover:shadow-md">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span class="hidden md:inline">Logout</span>
+                        </a>
                     {% else %}
-                        <a href="{{ url_for('farmerlogin') }}" class="btn inline-block px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700">Login</a>
+                        <a href="{{ url_for('farmerlogin') }}" class="inline-flex items-center space-x-1 px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition-all shadow-sm hover:shadow-md">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span>Login</span>
+                        </a>
                     {% endif %}
                 </div>
             </div>
@@ -40,111 +114,226 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="container mx-auto px-6 py-24">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-            <div class="absolute top-0 right-0 w-72 h-72 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-            <div class="absolute -bottom-8 left-20 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
-        <!-- Back Button -->
-        <div class="mb-6">
-            <a href="/homepage" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+    <div class="container mx-auto px-4 py-24">
+        <!-- Back Button and Page Header -->
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
+            <a href="/homepage" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-800 rounded-full hover:bg-gray-200 transition-colors shadow-sm mb-4 md:mb-0">
                 <i class="fas fa-arrow-left mr-2"></i> Back to Homepage
             </a>
-          </div>
-
-        <!-- Heading -->
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-gray-800 mb-4">Product Store</h1>
-            <p class="text-gray-600">Explore and purchase agricultural products.</p>
+            
+            <div class="text-center md:text-right">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Agricultural Marketplace</h1>
+                <p class="text-gray-600 mt-1">Find quality products from trusted farmers</p>
+            </div>
         </div>
 
         <!-- Search and Filters -->
-        <div class="filter-container flex flex-wrap justify-center gap-4 mb-8">
-            <input type="text" id="searchBar" placeholder="Search product..." onkeyup="filterProducts()"
-                   class="px-4 py-2 rounded-lg bg-white/50 border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors">
-            <select id="categoryFilter" onchange="filterProducts()"
-                    class="px-4 py-2 rounded-lg bg-white/50 border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors">
-                <option value="">All Categories</option>
-                <option value="crop">Crops</option>
-                <option value="machinery">Machinery</option>
-                <option value="fertilizers">Fertilizers</option>
-                <option value="husbandry">Husbandry</option>
-            </select>
-            <input type="number" id="minPrice" placeholder="Min Price" oninput="filterProducts()"
-                   class="px-4 py-2 rounded-lg bg-white/50 border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors">
-            <input type="number" id="maxPrice" placeholder="Max Price" oninput="filterProducts()"
-                   class="px-4 py-2 rounded-lg bg-white/50 border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors">
-            <button onclick="resetFilters()"
-                    class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
-                Reset
-            </button>
+        <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-filter text-brand mr-2"></i> Filter Products
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    <input type="text" id="searchBar" placeholder="Search products..." onkeyup="filterProducts()"
+                        class="w-full pl-10 pr-4 py-2 rounded-xl bg-white/90 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors">
+                </div>
+                
+                <div class="relative">
+                    <i class="fas fa-tags absolute left-3 top-3 text-gray-400"></i>
+                    <select id="categoryFilter" onchange="filterProducts()"
+                            class="w-full pl-10 pr-4 py-2 rounded-xl bg-white/90 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors appearance-none">
+                        <option value="">All Categories</option>
+                        <option value="crop">Crops & Produce</option>
+                        <option value="machinery">Farm Machinery</option>
+                        <option value="fertilizers">Fertilizers & Soil</option>
+                        <option value="husbandry">Animal Husbandry</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-400 pointer-events-none"></i>
+                </div>
+                
+                <div class="relative">
+                    <i class="fas fa-rupee-sign absolute left-3 top-3 text-gray-400"></i>
+                    <input type="number" id="minPrice" placeholder="Min Price" oninput="filterProducts()"
+                        class="w-full pl-10 pr-4 py-2 rounded-xl bg-white/90 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors">
+                </div>
+                
+                <div class="relative">
+                    <i class="fas fa-rupee-sign absolute left-3 top-3 text-gray-400"></i>
+                    <input type="number" id="maxPrice" placeholder="Max Price" oninput="filterProducts()"
+                        class="w-full pl-10 pr-4 py-2 rounded-xl bg-white/90 border border-gray-200 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors">
+                </div>
+                
+                <button onclick="resetFilters()"
+                        class="w-full flex items-center justify-center space-x-2 bg-brand text-white rounded-xl hover:bg-brand-dark transition-colors py-2 shadow-sm hover:shadow-md">
+                    <i class="fas fa-redo-alt"></i>
+                    <span>Reset Filters</span>
+                </button>
+            </div>
         </div>
 
-        <!-- Product List -->
-        <div class="store-container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8" id="productContainer">
+        <!-- Product Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="productContainer">
             {% for product in products %}
-            <div class="product-card bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-6 border border-white/20 cursor-pointer transition-transform transform hover:scale-105"
+            <div class="product-card group bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1"
                  data-name="{{ product.product_name|lower }}" 
                  data-category="{{ product.product_type|lower }}" 
-                 data-price="{{ product.price }}"
-                 onclick="openModal(
-                     '{{ product.product_name }}', 
-                     '{{ product.price }}', 
-                     '{{ product.description }}', 
-                     '{{ product.image_path[0] if product.image_path is iterable and product.image_path is not string else product.image_path }}', 
-                     '{{ product.name }}', 
-                     '{{ product.email }}', 
-                     '{{ product.contact_number }}', 
-                     '{{ product.locality_address }}'
-                 )">
-                <div class="product-image relative">
+                 data-price="{{ product.price }}">
+                <div class="product-image relative h-48 overflow-hidden">
                     {% if product.image_path|length > 1 %}
                     <!-- Image Carousel -->
-                    <div class="carousel">
-                        <div class="carousel-container" id="carousel-{{ loop.index }}">
+                    <div class="carousel h-full">
+                        <div class="carousel-container h-full" id="carousel-{{ loop.index }}">
                             {% for img in product.image_path %}
-                            <img class="carousel-image w-full h-48 object-cover rounded-lg" src="{{ img }}" alt="{{ product.product_name }}" />
+                            <img class="carousel-image w-full h-full object-cover" src="{{ img }}" alt="{{ product.product_name }}" />
                             {% endfor %}
                         </div>
-                        <button class="prev-btn absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white rounded-full p-2 hover:bg-gray-700"
-                                onclick="prevSlide({{ loop.index }})">&#10094;</button>
-                        <button class="next-btn absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white rounded-full p-2 hover:bg-gray-700"
-                                onclick="nextSlide({{ loop.index }})">&#10095;</button>
+                        <button class="prev-btn absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/40 text-white rounded-full p-2 hover:bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                onclick="event.stopPropagation(); prevSlide({{ loop.index }})">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="next-btn absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/40 text-white rounded-full p-2 hover:bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                onclick="event.stopPropagation(); nextSlide({{ loop.index }})">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                     {% else %}
                     <!-- Single Image -->
-                    <img src="{{ product.image_path[0] }}" alt="{{ product.product_name }}" class="w-full h-48 object-cover rounded-lg" />
+                    <img src="{{ product.image_path[0] }}" alt="{{ product.product_name }}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
                     {% endif %}
+                    
+                    <!-- Category Badge -->
+                    <div class="absolute top-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                        {{ product.product_type }}
+                    </div>
                 </div>
-                <div class="product-details mt-4">
-                    <div class="product-name text-xl font-semibold text-gray-800">{{ product.product_name }}</div>
-                    <div class="product-price text-orange-600 text-lg font-medium">₹{{ product.price }}</div>
-                    <div class="product-description text-gray-600 text-sm mt-2">{{ product.description }}</div>
-                    <div class="product-quantity text-gray-600 text-sm mt-2">Quantity: {{ product.quantity }}</div>
+                
+                <div class="p-5">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800 line-clamp-1">{{ product.product_name }}</h3>
+                        <span class="text-brand font-bold">₹{{ product.price }}</span>
+                    </div>
+                    
+                    <p class="text-gray-600 text-sm line-clamp-2 h-10 mb-3">{{ product.description }}</p>
+                    
+                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <div class="text-sm text-gray-500">
+                            <i class="fas fa-cubes mr-1"></i> {{ product.quantity }} available
+                        </div>
+                        
+                        <button onclick="openModal(
+                            '{{ product.product_name }}', 
+                            '{{ product.price }}', 
+                            '{{ product.description }}', 
+                            '{{ product.image_path[0] if product.image_path is iterable and product.image_path is not string else product.image_path }}', 
+                            '{{ product.name }}', 
+                            '{{ product.email }}', 
+                            '{{ product.contact_number }}', 
+                            '{{ product.locality_address }}'
+                        )" class="flex items-center justify-center space-x-1 bg-brand/10 hover:bg-brand/20 text-brand px-3 py-1 rounded-full transition-colors">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Details</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             {% endfor %}
         </div>
+        
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16">
+            <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                <i class="fas fa-search text-4xl text-gray-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">No Products Found</h3>
+            <p class="text-gray-600 mb-6">Try adjusting your search or filter criteria</p>
+            <button onclick="resetFilters()" class="inline-flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-lg hover:bg-brand-dark transition-colors">
+                <i class="fas fa-redo-alt"></i>
+                <span>Reset All Filters</span>
+            </button>
+        </div>
     </div>
 
-    <!-- Modal -->
-    <div id="productModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
-        <div class="modal-content bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20 w-full max-w-2xl">
-            <span class="close-btn absolute top-4 right-4 text-2xl cursor-pointer hover:text-gray-700" onclick="closeModal()">&times;</span>
-            <img class="modal-image w-full h-64 object-cover rounded-lg" id="modalImage" src="" alt="Product Image">
-            <div class="modal-details mt-6">
-                <div class="modal-name text-2xl font-bold text-gray-800" id="modalName"></div>
-                <div class="modal-price text-orange-600 text-xl font-medium mt-2" id="modalPrice"></div>
-                <div class="modal-description text-gray-600 text-sm mt-4" id="modalDescription"></div>
-                <div class="modal-seller-name text-gray-800 mt-4" id="modalSellerName"></div>
-                <div class="modal-email text-gray-800 mt-2" id="modalEmail"></div>
-                <div class="modal-contact text-gray-800 mt-2" id="modalContact"></div>
-                <div class="modal-address text-gray-800 mt-2" id="modalAddress"></div>
+    <!-- Product Modal -->
+    <div id="productModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden">
+        <div class="modal-content bg-white rounded-2xl shadow-2xl p-0 w-full max-w-2xl max-h-[90vh] overflow-hidden">
+            <div class="relative">
+                <button class="absolute top-4 right-4 z-10 bg-black/50 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-black/70 transition-colors" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <img class="w-full h-64 object-cover" id="modalImage" src="" alt="Product Image">
+            </div>
+            
+            <div class="p-6 custom-scrollbar overflow-y-auto max-h-[calc(90vh-16rem)]">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800" id="modalName"></h2>
+                    <div class="text-2xl font-bold text-brand" id="modalPrice"></div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-xl p-4 mb-6">
+                    <h3 class="text-gray-700 font-medium mb-2">Product Description</h3>
+                    <p class="text-gray-600" id="modalDescription"></p>
+                </div>
+                
+                <div class="border-t border-gray-100 pt-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Seller Information</h3>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center mr-3">
+                                <i class="fas fa-user text-brand"></i>
+                            </div>
+                            <div id="modalSellerName" class="text-gray-700"></div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center mr-3">
+                                <i class="fas fa-envelope text-brand"></i>
+                            </div>
+                            <div id="modalEmail" class="text-gray-700"></div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center mr-3">
+                                <i class="fas fa-phone text-brand"></i>
+                            </div>
+                            <div id="modalContact" class="text-gray-700"></div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center mr-3">
+                                <i class="fas fa-map-marker-alt text-brand"></i>
+                            </div>
+                            <div id="modalAddress" class="text-gray-700"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-100 p-4 flex justify-end bg-gray-50">
+                <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors mr-3">
+                    Close
+                </button>
+                <button class="px-4 py-2 bg-brand text-white rounded-lg hover:bg-brand-dark transition-colors flex items-center space-x-2">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Contact Seller</span>
+                </button>
             </div>
         </div>
     </div>
 
     <script>
+        // Initialize carousel data indices
+        document.addEventListener('DOMContentLoaded', function() {
+            const carousels = document.querySelectorAll('.carousel-container');
+            carousels.forEach(carousel => {
+                carousel.dataset.index = 0;
+            });
+        });
+
         function nextSlide(index) {
+            event.stopPropagation();
             let container = document.getElementById("carousel-" + index);
             let images = container.getElementsByClassName("carousel-image");
             let totalImages = images.length;
@@ -156,6 +345,7 @@
         }
 
         function prevSlide(index) {
+            event.stopPropagation();
             let container = document.getElementById("carousel-" + index);
             let images = container.getElementsByClassName("carousel-image");
             let totalImages = images.length;
@@ -171,8 +361,8 @@
             let selectedCategory = document.getElementById("categoryFilter").value.toLowerCase();
             let minPrice = document.getElementById("minPrice").value;
             let maxPrice = document.getElementById("maxPrice").value;
-
             let products = document.getElementsByClassName("product-card");
+            let visibleCount = 0;
 
             for (let product of products) {
                 let name = product.dataset.name;
@@ -186,9 +376,18 @@
 
                 if (matchesSearch && matchesCategory && matchesPrice) {
                     product.style.display = "block";
+                    visibleCount++;
                 } else {
                     product.style.display = "none";
                 }
+            }
+            
+            // Show empty state if no products
+            const emptyState = document.getElementById('emptyState');
+            if (visibleCount === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
             }
         }
 
@@ -205,15 +404,17 @@
             document.getElementById('modalPrice').innerText = `₹${price}`;
             document.getElementById('modalDescription').innerText = description;
             document.getElementById('modalImage').src = image;
-            document.getElementById('modalSellerName').innerText = `Seller: ${sellerName}`;
-            document.getElementById('modalEmail').innerText = `Email: ${email}`;
-            document.getElementById('modalContact').innerText = `Contact: ${contact}`;
-            document.getElementById('modalAddress').innerText = `Address: ${address}`;
+            document.getElementById('modalSellerName').innerText = sellerName;
+            document.getElementById('modalEmail').innerText = email;
+            document.getElementById('modalContact').innerText = contact;
+            document.getElementById('modalAddress').innerText = address;
             document.getElementById('productModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
         }
 
         function closeModal() {
             document.getElementById('productModal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
         }
 
         // Close modal when clicking outside of it

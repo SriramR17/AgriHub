@@ -3,290 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twitter-like Communication Page</title>
+    <title>AgriHub Community</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            light: '#FEF9F3',
+                            DEFAULT: '#F97316',
+                            dark: '#C2410C',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-b from-brand-light to-white min-h-screen font-sans">
+    <!-- Navbar with frosted glass effect -->
+    <nav class="bg-white/90 backdrop-blur-md shadow-md fixed w-full z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="/homepage" class="flex items-center space-x-2">
+                <span class="text-3xl text-brand-dark font-bold">AgriHub</span>
+                <span class="hidden md:inline-block text-sm text-gray-600">Connect • Share • Grow</span>
+            </a>
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
+                    <i class="fas fa-user-circle text-gray-600"></i>
+                    <span class="text-gray-700">{{ user_name }}</span>
+                    <span class="text-xs px-2 py-1 bg-brand rounded-full text-white">{{session['type']}}</span>
+                </div>
+                <a href="{{ url_for('logout') }}" class="bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition-colors flex items-center space-x-1">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="hidden md:inline">Logout</span>
+                </a>
+            </div>
+        </div>
+    </nav>
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <div class="container mx-auto px-4 sm:px-6 pt-24 pb-12">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Left Side: Posts -->
+            <div class="w-full md:w-2/3 order-2 md:order-1">
+                <div class="mb-6 flex items-center space-x-4">
+                    <a href="/homepage" class="flex items-center px-4 py-2 bg-gray-100 text-gray-800 rounded-full hover:bg-gray-200 transition-colors shadow-sm">
+                        <i class="fas fa-arrow-left mr-2"></i> Back
+                    </a>
+                    <h2 class="text-2xl font-bold text-gray-800">Community Feed</h2>
+                </div>
+
+                <!-- Create Post Card -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 transition-all hover:shadow-xl">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-edit mr-2 text-brand"></i> Share Your Thoughts
+                    </h3>
+                    <form action="{{ url_for('post_thought') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                        <textarea name="text" placeholder="What's on your mind today?" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand focus:border-transparent resize-none h-32 transition-all"></textarea>
+                        
+                        <div class="flex flex-wrap items-center justify-between">
+                            <div class="relative group">
+                                <input type="file" name="photo" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                <button type="button" class="flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-image text-green-600"></i>
+                                    <span>Add Photo</span>
+                                </button>
+                            </div>
+                            
+                            <button type="submit" class="bg-brand text-white px-6 py-3 rounded-xl hover:bg-brand-dark transition-colors shadow-md hover:shadow-lg flex items-center space-x-2">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Post</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Feed Title -->
+                <div class="flex items-center space-x-3 mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Recent Posts</h2>
+                    <div class="h-1 bg-brand flex-grow rounded-full"></div>
+                </div>
+
+                <!-- Posts Feed -->
+                <div class="space-y-6">
+                    {% for post in posts %}
+                    <div class="bg-white rounded-2xl shadow-lg p-6 transition-all hover:shadow-xl">
+                        <!-- User Info -->
+                        <div class="flex items-center space-x-3">
+                            <!-- Profile Picture -->
+                            {% if post.profile_picture %}
+                            <img src="{{ url_for('static', filename='uploads/' + post.profile_picture.split('/')[-1]) }}" 
+                                alt="Profile Picture"
+                                class="w-12 h-12 rounded-full object-cover border-2 border-brand shadow">
+                            {% else %}
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-brand to-orange-300 flex items-center justify-center text-xl font-bold text-white shadow">
+                                {{ post.user_name[0] }}
+                            </div>
+                            {% endif %}
+                            
+                            <!-- User details -->
+                            <div>
+                                <a href="/profile/{{ post.user_number }}" class="font-bold text-gray-900 hover:text-brand transition-colors">
+                                    {{ post.user_name }}
+                                </a>
+                                <p class="text-xs text-gray-500">{{ post.timestamp.strftime('%b %d, %Y • %I:%M %p') }}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Post Content -->
+                        <div class="mt-4">
+                            <!-- Post Message -->
+                            <p class="text-lg font-serif text-gray-800 mb-4 leading-relaxed">{{ post.text }}</p>
+                            
+                            <!-- Post Image (if any) -->
+                            {% if post.photo_path %}
+                            <div class="rounded-xl overflow-hidden shadow-md mt-3 mb-2">
+                                <img src="{{ url_for('static', filename=post.photo_path) }}" 
+                                    alt="Post Photo"
+                                    class="w-full max-h-96 object-cover transform transition-transform hover:scale-105">
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+                            <button class="flex items-center space-x-1 text-gray-500 hover:text-brand transition-colors">
+                                <i class="far fa-heart"></i>
+                                <span>Like</span>
+                            </button>
+                            <button class="flex items-center space-x-1 text-gray-500 hover:text-brand transition-colors">
+                                <i class="far fa-comment"></i>
+                                <span>Comment</span>
+                            </button>
+                            <button class="flex items-center space-x-1 text-gray-500 hover:text-brand transition-colors">
+                                <i class="far fa-share-square"></i>
+                                <span>Share</span>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Right Side: Community Members -->
+            <div class="w-full md:w-1/3 order-1 md:order-2">
+                <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                            <i class="fas fa-users text-brand mr-2"></i> Community Members
+                        </h2>
+                        <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">{{ users|length }} Members</span>
+                    </div>
+                    
+                    <div class="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto pr-2 custom-scrollbar">
+                        {% for user in users %}
+                        <a href="{{ url_for('profile_page', mobile_number=user.mobile_number) }}" 
+                           class="flex items-center p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-200 group">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand to-orange-300 flex items-center justify-center text-white font-bold shadow-sm group-hover:shadow">
+                                {{ user.name[0] }}
+                            </div>
+                            <div class="ml-3 flex-grow">
+                                <p class="font-semibold text-gray-800 group-hover:text-brand transition-colors">{{ user.name }}</p>
+                                <div class="flex items-center">
+                                    <span class="text-xs px-2 py-0.5 bg-gray-100 rounded-full text-gray-600">{{ user.type }}</span>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right opacity-0 group-hover:opacity-100 text-brand transition-opacity"></i>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-gray-100">
+                        <button class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-xl transition-colors flex items-center justify-center space-x-2">
+                            <i class="fas fa-search"></i>
+                            <span>Find More Members</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional style for custom scrollbar -->
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            height: 100vh;
-            overflow: hidden;
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
         }
-        .container {
-            display: flex;
-            width: 100%;
-            max-width: 1200px;
-            box-sizing: border-box;
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
         }
-        .left-sidebar, .right-sidebar {
-            width:25%;
-            padding: 20px;
-            box-sizing: border-box;
-            background-color: #fff;
-            height: 100vh;
-            overflow-y: auto;
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #F97316;
+            border-radius: 10px;
         }
-        .left-sidebar {
-            border-right: 1px solid #ddd;
-        }
-        .right-sidebar {
-            border-left: 1px solid #ddd;
-        }
-        .center-column {
-            width: 50%;
-            padding: 20px;
-            box-sizing: border-box;
-            height: 100vh;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .message-box {
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        }
-        .message-box strong {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .search-box {
-            margin-bottom: 20px;
-        }
-        .search-box input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .buttons .btn {
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .buttons .btn:hover {
-            background-color: #0056b3;
-        }
-        .famous-persons, .groups {
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .famous-persons h3, .groups h3 {
-            margin: 0 0 10px 0;
-        }
-        .famous-persons ul, .groups ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .famous-persons ul li, .groups ul li {
-            padding: 5px 0;
-            display: flex;
-            align-items: center;
-        }
-        .famous-persons ul li img {
-            width: 30px; /* Adjust size of the avatar image */
-            height: 30px;
-            border-radius: 50%; /* Ensure it's a circle */
-            margin-right: 10px;
-        }
-        .new-message-box {
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .new-message-box h3 {
-            margin: 0 0 10px 0;
-        }
-        .new-message-box textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            resize: vertical;
-            height: 80px;
-            margin-bottom: 10px;
-        }
-        .submit-btn {
-            padding: 10px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .submit-btn:hover {
-            background-color: #218838;
-        }
-        .icon-container {
-            display: flex;
-            justify-content: space-between;
-            width: 200px; /* Adjust width as needed */
-            margin-top: 20px;
-        }
-        .icon {
-            font-size: 24px; /* Adjust size as needed */
-            color: #2fb7ae; /* Adjust color as needed */
-            cursor: pointer;
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #C2410C;
         }
     </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Left Sidebar -->
-        <div class="left-sidebar">
-            <div class="search-box">
-                <input type="text" placeholder="Search" id="search">
-            </div>
-            <div class="buttons">
-                <button class="btn">Farmers</button>
-                <button class="btn">Manufacturer</button>
-                <button class="btn">Contractor</button>
-                <button class="btn">Seller</button>
-                <button class="btn">Gardener</button>
-                <button class="btn">Harvester</button>
-            </div>
-            <div class="famous-persons">
-                <h3>Famous Persons</h3>
-                <ul>
-                    <li><img src="\static\images\download (1).jpg" alt="Subhash Palekar"><span>Subhash Palekar</span></li>
-                    <li><img src="\static\images\download (2).jpg" alt="Krishna Byre Gowda"><span>Krishna Byre Gowda</span></li>
-                    <li><img src="\static\images\download (3).jpg" alt="P. Sainath"><span>P. Sainath</span></li>
-                    <li><img src="\static\images\download.jpg" alt="Devinder Sharma"><span>Devinder Sharma</span></li>
-                    <li><img src="\static\images\images.jpg" alt="Narayana Reddy"><span>Narayana Reddy</span></li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Center Column -->
-        <div class="center-column">
-            <div class="message-box">
-                <strong>Ramesh</strong>
-                <p>Hey everyone, I'm Ramesh from Andhra Pradesh. Thinking of trying out this new organic fertilizer on my farm. Any tips or experiences to share? #OrganicFarming #FertilizerTips.</p>
-                <div class="icon-container">
-                    <i class="far fa-thumbs-up icon"></i> <!-- Like icon -->
-                    <i class="far fa-comment icon"></i> <!-- Comment icon -->
-                    <i class="fas fa-share icon"></i> <!-- Share icon -->
-                </div>
-            </div>
-            <div class="message-box">
-                <strong>Kiran</strong>
-                <p>Namaste, I'm Kiran from Karnataka. The prices we're getting for our crops are just not fair. Who's with me in raising our voices? #FarmersProtest #FairPrices.</p>
-                <div class="icon-container">
-                    <i class="far fa-thumbs-up icon"></i> <!-- Like icon -->
-                    <i class="far fa-comment icon"></i> <!-- Comment icon -->
-                    <i class="fas fa-share icon"></i> <!-- Share icon -->
-                </div>
-            </div>
-            <div class="message-box">
-                <strong>Radha</strong>
-                <p>Hello friends, this is Radha from Uttar Pradesh. I've been using drip irrigation and it's been a game-changer for me. Saves water and boosts yield. #DripIrrigation #FarmingTips.</p>
-                <div class="icon-container">
-                    <i class="far fa-thumbs-up icon"></i> <!-- Like icon -->
-                    <i class="far fa-comment icon"></i> <!-- Comment icon -->
-                    <i class="fas fa-share icon"></i> <!-- Share icon -->
-                </div>
-            </div>
-            <div class="message-box">
-                <strong>Amit</strong>
-                <p>Hi all, I'm Amit from Maharashtra. The use of pesticides is taking a toll on our health and crops. It's time to switch to safer alternatives. #PesticideFree #SafeFarming.</p>
-                <div class="icon-container">
-                    <i class="far fa-thumbs-up icon"></i> <!-- Like icon -->
-                    <i class="far fa-comment icon"></i> <!-- Comment icon -->
-                    <i class="fas fa-share icon"></i> <!-- Share icon -->
-                </div>
-            </div>
-            <div class="message-box">
-                <strong>Karthik</strong>
-                <p>Greetings, I'm Karthik from Tamil Nadu. Our traditional farming methods have sustained us for generations. Let's not lose them to modernization. #TraditionalFarming #Heritage.</p>
-                <div class="icon-container">
-                    <i class="far fa-thumbs-up icon"></i> <!-- Like icon -->
-                    <i class="far fa-comment icon"></i> <!-- Comment icon -->
-                    <i class="fas fa-share icon"></i> <!-- Share icon -->
-                </div>
-            </div>
-            <div class="message-box">
-                <strong>Sangeeta</strong>
-                <p>Jai Kisan! I'm Sangeeta from Punjab. Join me in the fight for our rights. Together, we can make a difference. #FarmersUnity #Protest.</p>
-                <div class="icon-container">
-                    <i class="far fa-thumbs-up icon"></i> <!-- Like icon -->
-                    <i class="far fa-comment icon"></i> <!-- Comment icon -->
-                    <i class="fas fa-share icon"></i> <!-- Share icon -->
-                </div>
-            </div>
-            <div class="message-box">
-                <strong>Ravi</strong>
-                <p>Hey there, this is Ravi from Rajasthan. Embracing technology has helped me farm smarter. What tech innovations are you using on your farm? #TechInFarming #SmartFarming.</p>
-                <div class="icon-container">
-                    <i class="far fa-thumbs-up icon"></i> <!-- Like icon -->
-                    <i class="far fa-comment icon"></i> <!-- Comment icon -->
-                    <i class="fas fa-share icon"></i> <!-- Share icon -->
-                </div>
-            </div>
-            <div class="message-box">
-                <strong>Anjali</strong>
-                <p>Hello everyone, I'm Anjali from Gujarat. Seed sovereignty is crucial for our future. Let's protect our native seeds. #SeedSovereignty #ProtectOurSeeds.</p>
-                <div class="icon-container">
-                    <i class="far fa-thumbs-up icon"></i> <!-- Like icon -->
-                    <i class="far fa-comment icon"></i> <!-- Comment icon -->
-                    <i class="fas fa-share icon"></i> <!-- Share icon -->
-                </div>
-            </div>
-            <div class="message-box">
-                <strong>Venkat</strong>
-                <p>Hi friends, I'm Venkat from Telangana. Water is a lifeline for us farmers. Let's demand our right to water resources. #WaterRights #FarmersVoice.</p>
-                <div class="icon-container">
-                    <i class="far fa-thumbs-up icon"></i> <!-- Like icon -->
-                    <i class="far fa-comment icon"></i> <!-- Comment icon -->
-                    <i class="fas fa-share icon"></i> <!-- Share icon -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Sidebar -->
-        <div class="right-sidebar">
-            <div class="new-message-box">
-                <h3>Post New Message</h3>
-                <textarea placeholder="Type your message here..."></textarea>
-                    <button class="submit-btn">Submit</button>
-            </div>
-                <div class="groups">
-                    <h3>Groups and Communities</h3>
-                    <ul>
-                        <li>Bharatiya Jana Seva Mission ( BJSM ) </li>
-                        <li>IASP India Foundation</li>
-                        <li>Organic Farming Association of India</li>
-                        <li>Farmer Producer Organizations (FPOs)</li>
-                        <li>The Federation of All India Farmer Associations</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </body>
-    </html>
-    
+</body>
+</html>

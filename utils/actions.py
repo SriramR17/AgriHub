@@ -66,202 +66,6 @@ def selling_injection_in_mongo(name, email, contact, address, product_name, prod
         print(f"Error during insertion: {e}")
         return False
 
-def generate_response(user_input,type_of_llm,category):
-    if type_of_llm == '1':  # Agriculture RAG
-        llm = ChatOllama(model="llama3.2:3b")
-        PROMPT_TEMPLATE = '''
-        With the information provided, try to answer the question. 
-        If you cannot answer based on the information, say you are unable to find an answer.
-        Try to understand the context deeply and answer **only based on the given information**.
-        Do not generate irrelevant answers.
-
-        Context: {context}
-        Question: {question}
-
-        Helpful answer:
-        '''
-        INP_VARS = ['context', 'question']
-        custom_prompt_template = PromptTemplate(
-            template=PROMPT_TEMPLATE,
-            input_variables=INP_VARS
-        )
-
-        # Load FAISS embeddings
-        hfembeddings = HuggingFaceEmbeddings(
-            model_name="thenlper/gte-large",
-            model_kwargs={'device': 'cpu'}
-        )
-        vector_db = FAISS.load_local(
-            r"P:/college stuffs/mini project/Agri-Hub - Copy/datas/faiss/agri_data/",
-            hfembeddings,
-            allow_dangerous_deserialization=True
-        )
-
-        # Retrieval Chain using Ollama
-        retrieval_qa_chain = RetrievalQA.from_chain_type(
-            llm=llm,  # Pass the ChatOllama instance instead of a lambda function
-            chain_type="stuff",
-            retriever=vector_db.as_retriever(search_kwargs={'k': 5}),
-            return_source_documents=True,
-            chain_type_kwargs={"prompt": custom_prompt_template}
-        )
-
-        prompt = {'query': user_input}
-        model_out = retrieval_qa_chain(prompt)
-        answer = model_out['result']
-        return answer
-
-    elif type_of_llm == '2':
-        llm = ChatOllama(model="llama3.2:3b")  # Web Scraper RAG
-        PROMPT_TEMPLATE = '''
-        With the information provided, try to answer the question. 
-        If you cannot answer based on the information, say you are unable to find an answer.
-        Try to understand the context deeply and answer **only based on the given information**.
-        Do not generate irrelevant answers.
-
-        Context: {context}
-        Question: {question}
-
-        Helpful answer:
-        '''
-        INP_VARS = ['context', 'question']
-        custom_prompt_template = PromptTemplate(
-            template=PROMPT_TEMPLATE,
-            input_variables=INP_VARS
-        )
-
-        # Load FAISS embeddings
-        hfembeddings = HuggingFaceEmbeddings(
-            model_name="thenlper/gte-large",
-            model_kwargs={'device': 'cuda'}
-        )
-        vector_db = FAISS.load_local(
-            r"P:/college stuffs/mini project/Agri-Hub - Copy/datas/faiss/newweb-data/",
-            hfembeddings,
-            allow_dangerous_deserialization=True
-        )
-
-        # Retrieval Chain using Ollama
-        retrieval_qa_chain = RetrievalQA.from_chain_type(
-            llm=llm,  # Pass the ChatOllama instance instead of a lambda function
-            chain_type="stuff",
-            retriever=vector_db.as_retriever(search_kwargs={'k': 5}),
-            return_source_documents=True,
-            chain_type_kwargs={"prompt": custom_prompt_template}
-        )
-
-        prompt = {'query': user_input}
-        model_out = retrieval_qa_chain(prompt)
-        answer = model_out['result']
-        return answer
-    
-
-    elif type_of_llm=='3':
-        # database administrator
-        if category == "animals_details":
-            context = "create table animals_details(cattlename varchar(30), quantity integer(5));"
-        elif category == "cattle":
-            context = "create table cattle(name varchar(50), sellername varchar(50), price integer(10), quantity integer(10), locality varchar(100));"
-        elif category == "details":
-            context = "create table details(acre integer(30), current_crop varchar(30), soil_type varchar(30), fertilizer_name varchar(100), fertilizer_company varchar(100), equipments_name varchar(100), equipments_quantity integer(5), fertilizer_type varchar(100), labour_used integer(5), seed varchar(30));"
-        elif category == "fertilizer":
-            context = "create table fertilizer(name varchar(50), sellername varchar(50), usedfor varchar(60), quantity integer(10), price integer(10));"
-        elif category == "financial":
-            context = "create table financial(loanid varchar(20), userid varchar(20), loantype varchar(30), loanamount integer(10), interestrate varchar(10), loanterm varchar(30), applicationdate varchar(20), approvaldate varchar(20), loanstatus varchar(30), repaymentschedule varchar(20), expirationdate varchar(20), policystatus varchar(30), insurancetype varchar(60), coverageamount integer(10), policyterm varchar(30), policyid varchar(20), issuancedate varchar(20), coveragedetails varchar(60));"
-        elif category == "insurance":
-            context = "create table insurance(insurancetype varchar(60), insurancepolicyname varchar(100), duration varchar(30), companyname varchar(50), amount varchar(30));"
-        elif category == "loan":
-            context = "create table loan(loanname varchar(50), loantype varchar(50), interestrate varchar(30), bankname varchar(50), duration varchar(30));"
-        elif category == "machinery":
-            context = "create table machinery(name varchar(50), sellername varchar(50), price integer(10), quantity integer(10));"
-        elif category == "manufacturer":
-            context = "create table manufacturer(name varchar(100), manufacturer_id varchar(10), mobile_number integer(10), company_name varchar(100), email varchar(30), password varchar(20), type varchar(30));"
-        elif category == "personal_details":
-            context = "create table personal_details(name varchar(50), email varchar(20), address varchar(60), age integer(5), state varchar(20), pincode integer(10), mobilenumber integer(20));"
-        elif category == "purchase_history":
-            context = "create table purchase_history(product varchar(30), price integer(10), quantity integer(5), dateofpurchase varchar(20), insurancepolicyname varchar(60), insuranceduration varchar(20), insuranceissuancedate varchar(20), insuranceamount integer(10), loanname varchar(60), loanamount integer(10), loanduration varchar(20), loanissuancedate varchar(20));"
-        elif category == "rental":
-            context = "create table rental(name varchar(50), price integer(10), sellername varchar(50));"
-        elif category == "seed":
-            context = "create table seed(name varchar(50), type varchar(20), sellername varchar(50), quantity integer(10), price integer(10));"
-        elif category == "selling":
-            context = "create table selling(name varchar(50), EmailID varchar(20), contact_number integer(20), locality_address varchar(100), product_name varchar(50), product_quantity integer(20), unique_id varchar(20), price integer(10), password varchar(20), prodcut_type varchar(30));"
-        else:
-            pass
-
-
-        model_id = "siddharth-magesh/Tiny_Lllama-AgriDB"
-        model = AutoModelForCausalLM.from_pretrained(
-            model_id,
-            trust_remote_code=True,
-            device_map = "cpu"
-        )
-        tokenizer = AutoTokenizer.from_pretrained("TinyLlama/TinyLlama-1.1B-Chat-v1.0")
-        tokenizer.pad_token = tokenizer.eos_token
-        pipe = pipeline(
-            "text-generation",
-            model = model,
-            tokenizer = tokenizer,
-        )
-        llm = HuggingFacePipeline(
-            pipeline = pipe,
-            pipeline_kwargs={
-                "temperature": 0.3,
-                "max_new_tokens": 16,
-                "min_length": 8,  # Ensure a minimum length
-                "do_sample": True,
-                "num_beams": 5,
-                "repetition_penalty": 2.0,  # Penalize repetition
-                "no_repeat_ngram_size": 3,   # Use beam search for better long outputs
-            }
-        )
-        PROMPT_TEMPLATE = """\
-        <|im_start|>user
-        Given the context, generate an SQL query for the following question
-        context:{context}
-        question:{question}
-        <|im_end|>
-        <|im_start|>assistant
-        """
-        prompt = PromptTemplate(template=PROMPT_TEMPLATE,input_variables=["context","question"])
-        llm_chain = LLMChain(prompt=prompt, llm=llm)
-
-        answer = llm_chain.run(context=context,question=user_input)
-        return answer
-        
-
-    elif type_of_llm=='4':
-        #general chatbot
-
-        llm = HuggingFacePipeline.from_model_id(
-    model_id="siddharth-magesh/Tiny-Llama-Agri-Bot",
-    task="text-generation",
-    pipeline_kwargs={
-                "temperature": 0.3,
-                "max_new_tokens": 256,
-                "min_length": 32,  # Ensure a minimum length
-                "do_sample": True,
-                "num_beams": 5,
-                "repetition_penalty": 2.0,  # Penalize repetition
-                "no_repeat_ngram_size": 3,   # Use beam search for better long outputs
-            },
-            device = 0,
-        )
-        template = """Question: {question} ###Answer: """
-        prompt = PromptTemplate(template=template, input_variables=["question"])
-        llm_chain = LLMChain(prompt=prompt, llm=llm)
-        x = llm_chain.run({"question": user_input})
-
-
-        if "###Answer:" in x:
-            x = x.split("###Answer:")[1].strip()
-
-    #Keep only the first complete sentence
-        answer = x.split(".")[0] + "."
-
-        return answer
-
-
 def signup_mongo(name, mobile_number, password, address, gender, age, dateofbirth, email, blood_group, unique_id, district, state, country,type):
 
     if type=="farmer":
@@ -531,3 +335,31 @@ def get_weather(city):
         return response.json()
     else:
         return None
+    
+
+
+
+def get_user_name(number, user_type):
+    """
+    Fetch the user's name from the appropriate collection based on user type.
+    """
+    if user_type == "farmer":
+        collection = db["farmer_details"]
+    elif user_type == "buyer":
+        collection = db["buyer_details"]
+    else:
+        return None  # Invalid user type
+
+    user = collection.find_one({"mobile_number": number})
+    if user:
+        return user.get("name", "User")  # Return the name or a default value
+    return None
+
+
+def get_profile_picture(mobile_number):
+    user = db.farmer_details.find_one({"mobile_number": mobile_number}, {"profile_picture": 1}) or \
+           db.buyer_details.find_one({"mobile_number": mobile_number}, {"profile_picture": 1})
+
+    if user and "profile_picture" in user:
+        # Convert backslashes to forward slashes
+        return user["profile_picture"].replace("\\", "/")
