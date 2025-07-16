@@ -932,6 +932,5 @@ AgriMind AI does not engage in non-agricultural topics under any circumstances.'
     return jsonify({"response": bot_response})
 
 
-
 if __name__ == "__main__":
     app.run(debug=True)
