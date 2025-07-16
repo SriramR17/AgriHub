@@ -442,7 +442,7 @@
 
         function getBotResponse(userText) {
             // In a real implementation, this would be an API call
-            fetch("/chatprocess2", {
+            fetch("/chatprocess", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: userText })

@@ -13,13 +13,13 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-b from-orange-50 to-white min-h-screen">
+<body class="bg-gradient-to-b from-green-50 to-white min-h-screen">
     <!-- Navigation -->
     <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full z-50">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <a href="/" class="flex items-center space-x-3">
-                    <h1 class="text-3xl font-bold text-orange-700">AgriHub</h1>
+                    <h1 class="text-3xl font-bold text-green-700">AgriHub</h1>
                 </a>
                 <div class="flex items-center space-x-4">
                     {% if 'number' in session %}
@@ -36,7 +36,7 @@
 
     <!-- Main Content -->
     <div class="container mx-auto px-6 py-24">
-        <div class="absolute top-0 left-0 w-72 h-72 bg-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div class="absolute top-0 left-0 w-72 h-72 bg-green-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
             <div class="absolute top-0 right-0 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
             <div class="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
 
@@ -51,12 +51,12 @@
                 <h3 class="text-xl font-bold text-gray-800 mb-4">Select City for Weather</h3>
                 <div class="relative mb-4">
                     <input type="text" id="citySearch" placeholder="Search city..."
-                           class="w-full px-4 py-2 rounded-lg bg-white/50 border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-colors"
+                           class="w-full px-4 py-2 rounded-lg bg-white/50 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors"
                            onfocus="showAllCities()" onkeyup="filterCities()">
                     <div id="cityDropdown" class="absolute w-full bg-white/80 backdrop-blur-lg rounded-lg shadow-lg mt-1 hidden z-10"></div>
                 </div>
                 <button onclick="searchWeather()"
-                        class="w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
+                        class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
                     Search
                 </button>
 
@@ -103,7 +103,7 @@
                             <!-- Content -->
                             <div class="flex-1">
                                 <a href="{{ news['Article URL'] }}" target="_blank"
-                                   class="text-lg font-semibold text-orange-700 hover:text-orange-800 transition-colors">
+                                   class="text-lg font-semibold text-green-700 hover:text-green-800 transition-colors">
                                     {{ news['Title'] }}
                                 </a>
                                 <p class="text-sm text-gray-500 mt-1">{{ news['Published Date'] }}</p>
@@ -130,7 +130,7 @@
             cities.forEach(city => {
                 let div = document.createElement("div");
                 div.textContent = city;
-                div.className = "px-4 py-2 hover:bg-orange-100 cursor-pointer rounded-lg";
+                div.className = "px-4 py-2 hover:bg-green-100 cursor-pointer rounded-lg";
                 div.onclick = () => selectCity(city);
                 dropdown.appendChild(div);
             });
@@ -146,7 +146,7 @@
                 filteredCities.forEach(city => {
                     let div = document.createElement("div");
                     div.textContent = city;
-                    div.className = "px-4 py-2 hover:bg-orange-100 cursor-pointer rounded-lg";
+                    div.className = "px-4 py-2 hover:bg-green-100 cursor-pointer rounded-lg";
                     div.onclick = () => selectCity(city);
                     dropdown.appendChild(div);
                 });

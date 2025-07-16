@@ -1,14 +1,4 @@
 import re
-'''from langchain_core.prompts import PromptTemplate
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_ollama import ChatOllama
-import os'''
-'''from langchain.chains import RetrievalQA
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain_huggingface.llms import HuggingFacePipeline
-from langchain.chains import LLMChain
-from transformers import AutoModelForCausalLM , AutoTokenizer , pipeline , BitsAndBytesConfig'''
 import os
 import torch
 import time
@@ -20,9 +10,6 @@ import ollama
 import requests
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
-
-
-
 
 from pymongo import MongoClient 
 client = MongoClient('mongodb://localhost:27017/') 
