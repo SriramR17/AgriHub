@@ -91,5 +91,4 @@ Open your browser and head to:
 http://localhost:5000/
 ```
 
-## 🤝 Made with ♥️ by Sriram  
-_“Where agriculture meets automation, and buyers meet bhais.”_
+
