@@ -29,16 +29,11 @@ app = Flask(__name__)
 app.secret_key = "summasecretkey"
 UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
 
-
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-
-
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-
-    
 
 @app.before_request
 def before_request():
@@ -936,115 +931,7 @@ AgriMind AI does not engage in non-agricultural topics under any circumstances.'
     bot_response = response['message']['content']
     return jsonify({"response": bot_response})
 
-GROQ_API_KEY = "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"
-GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-@app.route("/chatprocess2", methods=["POST"])
-def chatprocess2():
-    """
-    Handle user messages and generate AI responses using Groq API with improved
-    error handling, context preservation, and user session tracking.
-    """
-    try:
-        data = request.json
-        user_message = data.get("message", "").strip()
-        user_id = data.get("user_id", "default_user")  # Add user identification
-        
-        # Get conversation history from session or create new one
-        conversation_history = session.get(f"conversation_{user_id}", [])
-        
-        SYSTEM_PROMPT = (
-            '''AgriMind AI Created by Sriram
-"AgriMind AI is a specialized artificial intelligence designed exclusively for Agriculture and Farming. It provides accurate, relevant, and practical information on topics including agronomy, horticulture, soil science, livestock management, irrigation, pest control, crop production, and other agricultural domains.
-Responses are concise and to the point. Additional details are provided only if explicitly requested.
-AgriMind AI strictly answers only agriculture-related questions. If a query falls outside this scope, it will respond with: 'I couldn't help with that question since I am an Agriculture AI.'
-It ensures accuracy, reliability, and relevance in every response, offering valuable insights for farmers, agronomists, and agriculture enthusiasts.
-AgriMind AI does not engage in non-agricultural topics under any circumstances."'''
-        )
-        
-        if not user_message:
-            return jsonify({"response": "Please enter a message."})
-        
-        # Prepare messages including conversation history (last 5 messages for context)
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-        
-        # Add conversation history (limited to last 5 exchanges to prevent token limits)
-        for msg in conversation_history[-10:]:  # Adjust number based on your token limits
-            messages.append(msg)
-            
-        # Add the current user message
-        messages.append({"role": "user", "content": user_message})
-        
-        headers = {
-            "Authorization": f"Bearer {GROQ_API_KEY}",
-            "Content-Type": "application/json"
-        }
-        
-        payload = {
-            "model": "llama-3.3-70b-versatile",
-            "messages": messages,
-            "max_tokens": 250,
-            "temperature": 1,  # Add temperature control for response variation
-        }
-        
-        # Add timeout to prevent hanging requests
-        response = requests.post(GROQ_API_URL, json=payload, headers=headers, timeout=10)
-        
-        if response.status_code == 200:
-            response_data = response.json()
-            bot_response = response_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-            
-            # Prevent duplicate greetings by removing the first repeated sentence
-            if bot_response.count("Hello.") > 1:
-                bot_response = bot_response.replace("Hello.", "", 1).strip()
-            
-            # Update conversation history
-            conversation_history.append({"role": "user", "content": user_message})
-            conversation_history.append({"role": "assistant", "content": bot_response})
-            
-            # Save updated conversation to session
-            session[f"conversation_{user_id}"] = conversation_history
-            
-            return jsonify({
-                "response": bot_response,
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            })
-            
-        elif response.status_code == 429:
-            # Rate limit exceeded
-            return jsonify({
-                "response": "I'm currently handling many requests. Please try again in a moment.",
-                "error": "rate_limit"
-            }), 429
-            
-        elif response.status_code == 401:
-            # Authentication error
-            app.logger.error("API Authentication failed")
-            return jsonify({
-                "response": "Sorry, there was an authentication issue. Please contact support.",
-                "error": "auth_error"
-            }), 500
-            
-        else:
-            # Other errors
-            app.logger.error(f"Groq API error: {response.status_code}, {response.text}")
-            return jsonify({
-                "response": "I'm having trouble processing your request. Please try again later.",
-                "error": "api_error"
-            }), 500
-            
-    except requests.Timeout:
-        return jsonify({
-            "response": "The request timed out. Please try again.",
-            "error": "timeout"
-        }), 504
-        
-    except Exception as e:
-        app.logger.error(f"Unexpected error in chatprocess2: {str(e)}")
-        return jsonify({
-            "response": "An unexpected error occurred. Please try again.",
-            "error": "server_error"
-        }), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
