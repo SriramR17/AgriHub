@@ -1,6 +1,6 @@
 # 🌱 AgriHub - Cultivating Connections in Agriculture
 
-Welcome to **AgriHub**, the digital mandi where **farmers** and **buyers** come together to sow ideas, grow connections, and reap success. Built with the finesse of **Flask**, **MongoDB**, and a frontend that even Mother Nature would swipe right on.
+Welcome to **AgriHub**, the digital mandi where **farmers** and **buyers** come together to sow ideas, grow connections, and reap success. 
 
 ## 🧩 Tech Stack
 
